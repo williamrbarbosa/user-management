@@ -7,18 +7,7 @@ The API is built using **NestJS**, **TypeScript**, **PostgreSQL**, and **Redis**
 1. [Tech Stack](#tech-stack)
 2. [Architecture Overview](#architecture-overview)
 3. [Main Principles](#main-principles)
-3. [Local Setup](#local-setup)
-4. [Instalacao e Configuracao](#instalacao-e-configuracao)
-5. [Como Funciona](#como-funciona)
-6. [Integracao via Embed (SDK)](#integracao-via-embed-sdk)
-7. [Integracao via Iframe Direto](#integracao-via-iframe-direto)
-8. [API Endpoints](#api-endpoints)
-9. [Estrutura do Projeto](#estrutura-do-projeto)
-10. [Modelo de Seguranca](#modelo-de-seguranca)
-11. [Funcionalidades](#funcionalidades)
-12. [Otimizacoes de Performance](#otimizacoes-de-performance)
-13. [Deploy](#deploy)
-14. [Troubleshooting](#troubleshooting)
+4. [Local Setup](#local-setup)
 
 ---
 
