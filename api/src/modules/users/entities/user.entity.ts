@@ -8,8 +8,8 @@ export class User {
 
   status: string;
 
-  login_count: number;
+  login_count?: number;
 
-  created_at: Date;
-  updated_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }

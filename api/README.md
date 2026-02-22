@@ -81,6 +81,10 @@ docker-compose exec api npx prisma db seed
 
 docker-compose exec api npm run start
 
+### 5. Run unit tests
+
+docker-compose exec api npm run test
+
 ---
 
 ## License

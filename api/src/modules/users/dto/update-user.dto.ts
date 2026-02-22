@@ -6,6 +6,6 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UpdateUserDto extends CreateUserDto {
   @IsString()
   @IsEnum(UserStatus)
-  @ApiProperty({ example: 'ACTIVE' })
+  @ApiProperty({ example: UserStatus.ACTIVE })
   status: string;
 }

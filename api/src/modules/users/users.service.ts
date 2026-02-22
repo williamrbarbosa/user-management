@@ -8,7 +8,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { Prisma, UserStatus } from '@prisma/client';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { HashService } from '../common/hash.service';
 import { AppError } from '../common/models';
 import { UsersRepository } from './users.repository';
@@ -32,7 +32,7 @@ export class UsersService {
 
     const data: Prisma.usersCreateInput = {
       ...createUserDto,
-      id: uuidv4(),
+      id: randomUUID(),
       status: UserStatus.ACTIVE,
       password: hashedPassword,
       //- Creation time cannot be updated but Last update time must always be updated.
@@ -101,9 +101,7 @@ export class UsersService {
     const user = await this.findOne(id);
 
     try {
-      const deletedUser = await this.usersRepository.delete(user.id);
-
-      return deletedUser;
+      return this.usersRepository.delete(user.id);
     } catch (err) {
       const error = err as AppError;
       throw new BadRequestException(
