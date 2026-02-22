@@ -66,3 +66,15 @@ Make sure you have installed:
 
 git clone https://github.com/williamrbarbosa/user-management
 cd user-management-platform
+
+---
+
+## License
+
+Proprietary - Todos os direitos reservados - William Barbosa
+
+---
+
+**Version:** 1.0.0
+**last Update:** Feb 2026
+**Developed by:** William Barbosa
