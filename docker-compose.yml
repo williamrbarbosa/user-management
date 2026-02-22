@@ -1,36 +1,20 @@
 services:
-  api:
-    container_name: user_management_api
-    build:
-      context: .
-      dockerfile: docker/api.Dockerfile
-    ports:
-      - "3000:3000"
-    env_file:
-      - ./api/.env
-    depends_on:
-      - postgres
-      - redis
-    volumes:
-      - ./apps/api:/app
-      - /app/node_modules
-    command: npm run start:dev
-
   postgres:
     image: postgres:16
-    container_name: user_management_postgres
+    restart: always
+    container_name: user-management-postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
-      POSTGRES_DB: users_management
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
 
   redis:
     image: redis:7
-    container_name: users_management_redis
+    container_name: user-management-redis
     ports:
       - "6379:6379"
 
