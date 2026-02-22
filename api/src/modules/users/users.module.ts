@@ -4,6 +4,7 @@ import { UsersController } from './users.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from '../prisma/prisma.module';
 import { HashService } from '../common/hash.service';
+import { UsersRepository } from './users.repository';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { HashService } from '../common/hash.service';
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, HashService],
+  providers: [UsersService, UsersRepository, HashService],
   exports: [UsersService],
 })
 export class UsersModule {}

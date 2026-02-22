@@ -6,6 +6,7 @@ import {
   Put,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -14,6 +15,7 @@ import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from '../common/decorators/user.decorator';
@@ -27,8 +29,8 @@ export class UsersController {
 
   @Post()
   @ApiOperation({ summary: 'Creates a new user bla' })
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.create(createUserDto);
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
   }
 
   @Put(':id')
@@ -39,8 +41,8 @@ export class UsersController {
     type: 'string',
     example: 'a1b2c3d4-e5f6-4789-abcd-ef1234567891',
   })
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return await this.usersService.update(id, updateUserDto);
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
@@ -51,8 +53,8 @@ export class UsersController {
     type: 'string',
     example: 'a1b2c3d4-e5f6-4789-abcd-ef1234567891',
   })
-  async remove(@Param('id') id: string, @User() user: UserFromJwt) {
-    return await this.usersService.remove(id, user.id);
+  remove(@Param('id') id: string, @User() user: UserFromJwt) {
+    return this.usersService.remove(id, user.id);
   }
 
   @Get()
@@ -60,8 +62,9 @@ export class UsersController {
     summary:
       'List all users for a given broker group (with optional pagination)',
   })
-  async findAll() {
-    return await this.usersService.findAll();
+  @ApiQuery({ name: 'page', required: false })
+  findAll(@Query('page') page?: number) {
+    return this.usersService.findAll(page);
   }
 
   @Get(':id')
@@ -72,7 +75,7 @@ export class UsersController {
     type: 'string',
     example: 'a1b2c3d4-e5f6-4789-abcd-ef1234567891',
   })
-  async findOne(@Param('id') id: string) {
-    return await this.usersService.findOne(id);
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(id);
   }
 }

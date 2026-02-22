@@ -9,14 +9,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { Prisma, UserStatus } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
-import { PrismaService } from '../prisma/prisma.service';
 import { HashService } from '../common/hash.service';
 import { AppError } from '../common/models';
+import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly prismaService: PrismaService,
+    private readonly usersRepository: UsersRepository,
     private readonly hashService: HashService,
   ) {}
 
@@ -41,11 +41,7 @@ export class UsersService {
     };
 
     try {
-      const createdUser = await this.prismaService.users.create({
-        data,
-      });
-
-      return createdUser;
+      return this.usersRepository.create(data);
     } catch (err) {
       const error = err as AppError;
       throw new BadRequestException(
@@ -70,32 +66,24 @@ export class UsersService {
       );
     }
 
-    const hashedPassword = await this.hashService.hashPassword(
-      updateUserDto.password,
-    );
-    const userPassword =
-      updateUserDto.password === undefined ||
-      updateUserDto.password === user.password
-        ? updateUserDto.password
-        : hashedPassword;
+    let password: string | undefined = undefined;
+
+    if (updateUserDto.password) {
+      password = await this.hashService.hashPassword(updateUserDto.password);
+    }
 
     const data: Prisma.usersUpdateInput = {
       ...updateUserDto,
       first_name: updateUserDto.first_name,
       last_name: updateUserDto.last_name,
-      password: userPassword,
+      password,
       status: updateUserDto.status as UserStatus,
       //- Creation time cannot be updated but Last update time must always be updated.
       updated_at: new Date(),
     };
 
     try {
-      const updatedUser = await this.prismaService.users.update({
-        where: { id },
-        data,
-      });
-
-      return updatedUser;
+      return this.usersRepository.update(id, data);
     } catch (err) {
       const error = err as AppError;
       throw new BadRequestException(
@@ -113,32 +101,44 @@ export class UsersService {
     const user = await this.findOne(id);
 
     try {
-      const updatedUser = await this.prismaService.users.delete({
-        where: { id: user.id },
-      });
+      const deletedUser = await this.usersRepository.delete(user.id);
 
-      return updatedUser;
+      return deletedUser;
     } catch (err) {
       const error = err as AppError;
       throw new BadRequestException(
-        'Erro ao tentar excluir Usuário. ' + error.message,
+        'Error trying to delete user. ' + error.message,
         { cause: error, description: error.message },
       );
     }
   }
 
-  async findAll(): Promise<User[]> {
-    const users = await this.prismaService.users.findMany();
+  async findAll(
+    page: number = 1,
+    limit: number = 6,
+  ): Promise<{
+    data: User[];
+    meta: { total: number; page: number; lastPage: number };
+  }> {
+    const skip = (page - 1) * limit;
 
-    return users;
+    const [data, total] = await Promise.all([
+      this.usersRepository.findAll(skip, limit),
+      this.usersRepository.count(),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        lastPage: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: string): Promise<User> {
-    const user = await this.prismaService.users.findUnique({
-      where: {
-        id,
-      },
-    });
+    const user = await this.usersRepository.findById(id);
 
     if (!user) {
       throw new NotFoundException('User not found.');
@@ -147,13 +147,7 @@ export class UsersService {
     return user;
   }
 
-  async findByEmail(email: string): Promise<User> {
-    const user = await this.prismaService.users.findFirst({
-      where: {
-        email,
-      },
-    });
-
-    return user;
+  findByEmail(email: string): Promise<User> {
+    return this.usersRepository.findByEmail(email);
   }
 }
