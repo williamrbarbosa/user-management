@@ -21,7 +21,7 @@ async function bootstrap() {
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ extended: true, limit: '50mb' }));
 
-  app.enableShutdownHooks();
+  app.enableShutdownHooks()
 
   // Swagger Settings
   const config = new DocumentBuilder()
