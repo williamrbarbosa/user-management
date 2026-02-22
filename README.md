@@ -1,4 +1,12 @@
 
+
+
+
+### 3. Up Docker containers
+
+docker
+
+
   api:
     container_name: user-management-api
     build:

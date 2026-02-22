@@ -16,6 +16,7 @@ import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { RegisterDto } from './dto/register.dto';
 import { User } from '../users/entities/user.entity';
+import { UserStatus } from '@prisma/client';
 
 type RegisterResponse = {
   status: number;
@@ -48,7 +49,7 @@ export class AuthService {
         last_name: registerDto.last_name,
         email: registerDto.email,
         password: registerDto.user_password,
-        status: 'active',
+        status: UserStatus.ACTIVE,
         login_count: 0,
         created_at: new Date(),
         updated_at: new Date(),

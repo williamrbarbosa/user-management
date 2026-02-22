@@ -18,5 +18,24 @@ services:
     ports:
       - "6379:6379"
 
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile # Verifique se o caminho do arquivo está correto
+    container_name: user-management-api
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+      REDIS_URL: "redis://redis:6379"
+      NODE_ENV: development
+      JWT_SECRET: "HkG+0L60Hn1s1+NpYnbvawKnCvk2S6ziZNNwTdiFym8="
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./api:/app # Volume para refletir mudanças de código em tempo real (opcional)
+
 volumes:
   pgdata:

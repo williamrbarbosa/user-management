@@ -33,7 +33,7 @@ export class UsersService {
     const data: Prisma.usersCreateInput = {
       ...createUserDto,
       id: uuidv4(),
-      status: 'ACTIVE',
+      status: UserStatus.ACTIVE,
       password: hashedPassword,
       created_at: new Date(),
       updated_at: new Date(),

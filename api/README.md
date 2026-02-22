@@ -67,11 +67,25 @@ Make sure you have installed:
 git clone https://github.com/williamrbarbosa/user-management
 cd user-management-platform
 
+### 2. Install dependecies
+
+docker-compose exec api npm install
+
+### 3. Generate database and seed data
+
+docker-compose exec api npx prisma db push
+docker-compose exec api npx prisma generate
+docker-compose exec api npx prisma db seed
+
+### 4. Start Application
+
+docker-compose exec api npm run start
+
 ---
 
 ## License
 
-Proprietary - Todos os direitos reservados - William Barbosa
+Proprietary - All right reserved to William Barbosa
 
 ---
 
