@@ -35,6 +35,7 @@ export class UsersService {
       id: uuidv4(),
       status: UserStatus.ACTIVE,
       password: hashedPassword,
+      //- Creation time cannot be updated but Last update time must always be updated.
       created_at: new Date(),
       updated_at: new Date(),
     };
@@ -57,6 +58,18 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
 
+    //Validating:
+    //- First and Last Name properties cannot be updated if the user is inactive.
+    const isNameChangeBlocked =
+      user.status === UserStatus.INACTIVE &&
+      (updateUserDto.first_name !== user.first_name ||
+        updateUserDto.last_name !== user.last_name);
+    if (isNameChangeBlocked) {
+      throw new BadRequestException(
+        'Inactive users cannot update first or last name',
+      );
+    }
+
     const hashedPassword = await this.hashService.hashPassword(
       updateUserDto.password,
     );
@@ -68,8 +81,11 @@ export class UsersService {
 
     const data: Prisma.usersUpdateInput = {
       ...updateUserDto,
+      first_name: updateUserDto.first_name,
+      last_name: updateUserDto.last_name,
       password: userPassword,
       status: updateUserDto.status as UserStatus,
+      //- Creation time cannot be updated but Last update time must always be updated.
       updated_at: new Date(),
     };
 

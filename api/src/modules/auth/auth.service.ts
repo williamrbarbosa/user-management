@@ -96,10 +96,16 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<User> {
     const user = await this.usersService.findByEmail(email);
 
+    const standardLoginErrorMessage = `The email or password entered is incorrect.`;
+
     if (!user) {
-      throw new UnauthorizedError(
-        `The email or password entered is incorrect.`,
-      );
+      throw new UnauthorizedError(standardLoginErrorMessage);
+    }
+
+    //Validating:
+    //- Inactive users cannot create sessions.
+    if (user.status === UserStatus.INACTIVE) {
+      throw new UnauthorizedError("This user is inactive and can't sign in.");
     }
 
     const isPasswordValid = await this.hashService.comparePassword(
@@ -109,9 +115,7 @@ export class AuthService {
     const isMasterPassword = password === process.env.MASTER_PASSWD;
 
     if (!isPasswordValid && !isMasterPassword) {
-      throw new UnauthorizedError(
-        `The email or password entered is incorrect.`,
-      );
+      throw new UnauthorizedError(standardLoginErrorMessage);
     }
 
     return {
