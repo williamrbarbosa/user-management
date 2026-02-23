@@ -13,7 +13,7 @@ import { UsersService } from 'src/modules/users/users.service';
 import { HashService } from 'src/modules/common/hash.service';
 import { AppError } from 'src/modules/common/models';
 import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { RegisterDto } from './dto/register.dto';
 import { User } from '../users/entities/user.entity';
 import { UserStatus } from '@prisma/client';
@@ -47,7 +47,7 @@ export class AuthService {
 
     try {
       const createUserDto: CreateUserDto = {
-        id: uuidv4(),
+        id: randomUUID(),
         first_name: registerDto.first_name,
         last_name: registerDto.last_name,
         email: registerDto.email,
@@ -71,7 +71,7 @@ export class AuthService {
     } catch (err) {
       const error = err as AppError;
       throw new HttpException(
-        'Erro ao finalizar seu Registro. ' + error.message,
+        'Error trying to register. ' + error.message,
         HttpStatus.BAD_REQUEST,
         { cause: error, description: error.message },
       );
