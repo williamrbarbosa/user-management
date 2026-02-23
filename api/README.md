@@ -31,13 +31,12 @@ src/
 ├── modules/
 │ ├── users/
 │ ├── sessions/
-│ └── auth/
-├── common/
-│ ├── guards/
-│ ├── interceptors/
-│ ├── filters/
-│ └── logger/
-├── prisma/
+│ ├── auth/
+│ ├── health/
+│ ├── prisma/
+│ ├── common/
+│ │ ├── decorators/
+│ │ └── models/
 └── main.ts
 
 ### Main Principles
@@ -46,7 +45,6 @@ src/
 - Clean separation of concerns
 - Domain-driven validations
 - Centralized error handling
-- Production-grade logging
 - Fully containerized setup
 
 ---

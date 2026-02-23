@@ -7,7 +7,7 @@ COPY api/package*.json ./
 
 RUN npm install
 
-# Copy ntire project
+# Copy entire project
 COPY api ./
 
 # Generate prisma client

@@ -21,7 +21,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: docker/api.Dockerfile # Verifique se o caminho do arquivo está correto
+      dockerfile: docker/api.Dockerfile
     container_name: user-management-api
     restart: always
     ports:
@@ -35,7 +35,25 @@ services:
       - postgres
       - redis
     volumes:
-      - ./api:/app # Volume para refletir mudanças de código em tempo real (opcional)
+      - ./api:/app
+      - /app/node_modules
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    container_name: user-management-web
+    restart: always
+    ports:
+      - "3001:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+    depends_on:
+      - api
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+      - /app/.next
 
 volumes:
   pgdata:
