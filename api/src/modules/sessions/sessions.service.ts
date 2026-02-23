@@ -7,18 +7,18 @@ import {
 import { CreateSessionDto } from './dto/create-session.dto';
 import { Session } from './entities/session.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { PrismaService } from '../prisma/prisma.service';
+import { SessionsRepository } from './sessions.repository';
 import { AppError } from '../common/models';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class SessionsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly sessionsRepository: SessionsRepository) {}
 
   async create(createSessionDto: CreateSessionDto): Promise<Session> {
     const { user_id, ...sessionDto } = createSessionDto;
 
-    const session = await this.findByActivebyUserId(user_id);
+    const session = await this.findActiveByUserId(user_id);
     if (session) {
       throw new ConflictException('This user already has an active Session.');
     }
@@ -36,11 +36,7 @@ export class SessionsService {
     };
 
     try {
-      const createdSession = await this.prismaService.sessions.create({
-        data,
-      });
-
-      return createdSession;
+      return this.sessionsRepository.create(data);
     } catch (err) {
       const error = err as AppError;
       throw new BadRequestException(
@@ -50,21 +46,25 @@ export class SessionsService {
     }
   }
 
-  async findAllByUserId(user_id: string): Promise<Session[]> {
-    const sessions = await this.prismaService.sessions.findMany({
-      where: { user_id },
-      orderBy: { created_at: 'desc' },
-    });
+  async terminateSession(user_id: string): Promise<Session> {
+    const session = await this.findActiveByUserId(user_id);
+    if (!session) {
+      throw new ConflictException('There is no active Session for this user.');
+    }
 
-    return sessions;
+    try {
+      return this.sessionsRepository.terminate(session.id);
+    } catch (err) {
+      const error = err as AppError;
+      throw new BadRequestException(
+        'Error trying to create session. ' + error.message,
+        { cause: error, description: error.message },
+      );
+    }
   }
 
   async findOne(id: string): Promise<Session> {
-    const session = await this.prismaService.sessions.findUnique({
-      where: {
-        id,
-      },
-    });
+    const session = await this.sessionsRepository.findById(id);
 
     if (!session) {
       throw new NotFoundException('Session not found.');
@@ -73,14 +73,11 @@ export class SessionsService {
     return session;
   }
 
-  async findByActivebyUserId(user_id: string): Promise<Session> {
-    const session = await this.prismaService.sessions.findFirst({
-      where: {
-        user_id,
-        terminated_at: null,
-      },
-    });
+  findAllByUserId(user_id: string): Promise<Session[]> {
+    return this.sessionsRepository.findByUserId(user_id);
+  }
 
-    return session;
+  findActiveByUserId(user_id: string): Promise<Session> {
+    return this.sessionsRepository.findActiveByUserId(user_id);
   }
 }

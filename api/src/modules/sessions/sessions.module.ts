@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from '../prisma/prisma.module';
 import { SessionsService } from './sessions.service';
+import { SessionsRepository } from './sessions.repository';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { SessionsService } from './sessions.service';
       signOptions: { expiresIn: '1d' },
     }),
   ],
-  providers: [SessionsService],
+  providers: [SessionsService, SessionsRepository],
   exports: [SessionsService],
 })
 export class SessionsModule {}

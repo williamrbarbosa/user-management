@@ -19,7 +19,7 @@ export class UsersRepository {
     return this.prismaService.users.delete({ where: { id } });
   }
 
-  findAll(skip: number = 0, take: number = 6): Promise<User[] | null> {
+  findAll(skip: number = 0, take: number = 6): Promise<User[] | []> {
     return this.prismaService.users.findMany({
       skip,
       take,
