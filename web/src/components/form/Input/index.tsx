@@ -18,9 +18,6 @@ interface InputProps extends React.HTMLAttributes<HTMLElement> {
   icon?: ReactNode;
   className?: string;
   placeholder?: string;
-  value?: string | number;
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
-  onBlur?: React.FocusEventHandler<HTMLInputElement>;
 }
 
 const Input: React.FC<InputProps> = (props) => {
@@ -36,9 +33,6 @@ const Input: React.FC<InputProps> = (props) => {
     icon,
     className,
     placeholder,
-    value,
-    onChange,
-    onBlur,
   } = props;
 
   const [showPassword, setShowPassword] = useState(false);
@@ -83,12 +77,6 @@ const Input: React.FC<InputProps> = (props) => {
           disabled={disabled}
           autoComplete={autoComplete ?? "off"}
           placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          onBlur={(e) => {
-            register?.onBlur?.(e);
-            onBlur?.(e);
-          }}
         />
         {icon && (
           <span

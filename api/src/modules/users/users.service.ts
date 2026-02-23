@@ -66,7 +66,7 @@ export class UsersService {
       );
     }
 
-    let password: string | undefined = undefined;
+    let password: string | undefined = user.password;
 
     if (updateUserDto.password) {
       password = await this.hashService.hashPassword(updateUserDto.password);

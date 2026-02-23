@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface LabelProps {
   id: string;
@@ -12,7 +12,7 @@ const Label: React.FC<LabelProps> = (props) => {
     <div className="mb-0 flex items-center gap-2">
       <label
         htmlFor={`${id}_label`}
-        className={`${className} block text-xs leading-6 text-gray-700`}
+        className={`${className} block text-sm leading-6 text-gray-700`}
       >
         {text}
       </label>

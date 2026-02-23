@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 
 import { messages } from "@/config/messages";
 import { useAppStore } from "@/store";
@@ -89,7 +88,6 @@ export const useExcludeUser = () => {
 export const useCreateUser = (onCreated?: (user: User) => void) => {
   const { setLoader, setToast } = useAppStore();
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   const { mutate } = useMutation({
     mutationFn: async (payload: User) => {
@@ -132,6 +130,7 @@ export const useGetUserById = (id: string) => {
       const response = await usersService.getUserById(id);
       return response.data;
     },
+    enabled: !!id,
   });
 
   useEffect(() => {
@@ -161,7 +160,6 @@ export const useGetUserById = (id: string) => {
 export const useEditUser = (id: string, onEdited?: (user: User) => void) => {
   const { setLoader, setToast } = useAppStore();
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   const { mutate } = useMutation({
     mutationFn: (payload: User) => {

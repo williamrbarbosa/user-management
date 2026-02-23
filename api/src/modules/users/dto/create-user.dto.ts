@@ -5,9 +5,11 @@ import {
   MaxLength,
   Matches,
   IsOptional,
+  IsEnum,
 } from 'class-validator';
 import { User } from '../entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserStatus } from '@prisma/client';
 
 export class CreateUserDto extends User {
   @IsString()
@@ -35,4 +37,9 @@ export class CreateUserDto extends User {
   })
   @ApiProperty({ example: '1234@ChangeIt' })
   password?: string;
+
+  @IsString()
+  @IsEnum(UserStatus)
+  @ApiProperty({ example: UserStatus.ACTIVE, enum: UserStatus })
+  status: string;
 }

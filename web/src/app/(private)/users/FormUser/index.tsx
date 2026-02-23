@@ -18,8 +18,24 @@ interface FormUserProps {
   idForm?: string;
 }
 
+type StatusOption = {
+  value: string;
+  name: string;
+};
+
 const FormUser: React.FC<FormUserProps> = (props) => {
   const { handleSubmit, onSubmit, register, errors, idForm } = props;
+
+  const UserStatus: StatusOption[] = [
+    {
+      value: "ACTIVE",
+      name: "Active",
+    },
+    {
+      value: "INACTIVE",
+      name: "Inactive",
+    },
+  ];
 
   return (
     <div className="w-full p-4">
@@ -28,9 +44,10 @@ const FormUser: React.FC<FormUserProps> = (props) => {
           <Form.Input
             register={register("first_name")}
             errors={errors}
-            field="name"
+            field="first_name"
             required
             placeholder="First Name"
+            label="First Name"
             type="text"
           />
           <Form.Input
@@ -39,6 +56,7 @@ const FormUser: React.FC<FormUserProps> = (props) => {
             field="last_name"
             required
             placeholder="Last Name"
+            label="Last Name"
             type="text"
           />
         </Form.Item>
@@ -50,7 +68,31 @@ const FormUser: React.FC<FormUserProps> = (props) => {
             field="email"
             required
             placeholder="Email"
+            label="Email"
             type="email"
+          />
+          {idForm === "create-user" && (
+            <Form.Input
+              register={register("password")}
+              errors={errors}
+              field="password"
+              placeholder="Password"
+              required
+              label="Password"
+              type="password"
+            />
+          )}
+        </Form.Item>
+
+        <Form.Item>
+          <Form.Select
+            register={register("status")}
+            errors={errors}
+            field="status"
+            label="Status"
+            disabled={idForm === "create-user"}
+            required
+            options={UserStatus}
           />
         </Form.Item>
       </form>

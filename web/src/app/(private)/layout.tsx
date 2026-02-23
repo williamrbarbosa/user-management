@@ -4,6 +4,7 @@ import { useAuth } from "@/modules/auth/hooks/useAuth";
 import { useUsersStore } from "@/modules/users/stores/users.store";
 import { ArrowLeftStartOnRectangleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function PrivateLayout({
   children,
@@ -12,6 +13,13 @@ export default function PrivateLayout({
 }) {
   const user = useUsersStore((s) => s.user);
   const { logout } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-200 dark:bg-zinc-950 text-zinc-950 dark:text-white duration-300">

@@ -16,16 +16,15 @@ import { UserFormData, userSchema } from "@/schemas/user.schema";
 import { useEditUser, useGetUserById } from "@/modules/users/hooks/users";
 
 interface UserEditModalProps {
-  id: string;
+  userData: User;
   isOpen: boolean;
+  page: number;
   onClose: () => void;
   onEdited: (user: User) => void;
 }
 
 const UserEditModal: React.FC<UserEditModalProps> = (props) => {
-  const { id, isOpen, onClose, onEdited } = props;
-
-  const userData = useGetUserById(id);
+  const { userData, isOpen, page, onClose, onEdited } = props;
 
   const {
     handleSubmit,
@@ -35,23 +34,16 @@ const UserEditModal: React.FC<UserEditModalProps> = (props) => {
     reset,
   } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
+    defaultValues: {
+      first_name: userData.first_name,
+      last_name: userData.last_name,
+      email: userData.email,
+      status: userData.status,
+    },
   });
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (userData) {
-      const formattedData = {
-        first_name: userData.first_name,
-        last_name: userData.last_name,
-        email: userData.email,
-        status: userData.status,
-      };
-
-      reset(formattedData);
-    }
-  }, [userData, reset, isOpen]);
-
-  const mutate = useEditUser(id, onEdited);
+  const mutate = useEditUser(userData.id!, onEdited);
 
   const idForm = "edit-user";
 
@@ -63,7 +55,7 @@ const UserEditModal: React.FC<UserEditModalProps> = (props) => {
     mutate(user, {
       onSuccess: () => {
         void queryClient.invalidateQueries({
-          queryKey: ["user_list"],
+          queryKey: [`users_list_${page}`],
           exact: false,
         });
         reset();
@@ -114,16 +106,16 @@ const UserEditModal: React.FC<UserEditModalProps> = (props) => {
                 </button>
 
                 <div className="flex flex-col gap-2 w-full p-8 mx-auto bg-gray-300 dark:bg-zinc-900">
-                  <h5 className="text-sm font-light text-white flex flex-row gap-2">
+                  <h5 className="text-sm font-light text-zinc-950 dark:text-gray-100 flex flex-row gap-2">
                     <PencilIcon className="w-5 h-5" /> Edit user
                   </h5>
                   {userData && (
                     <div className="flex flex-row gap-2 w-full">
                       <div className="w-full flex flex-col gap-2">
-                        <Dialog.Title className="text-lg font-semibold text-white mb-0">
+                        <Dialog.Title className="text-lg font-semibold text-zinc-950 dark:text-gray-100 mb-0">
                           {userData?.first_name} {userData?.last_name}
                         </Dialog.Title>
-                        <h5 className="text-xs font-light text-white -mt-2">
+                        <h5 className="text-xs font-light text-zinc-950 dark:text-gray-100 -mt-2">
                           {userData?.email}
                         </h5>
                       </div>

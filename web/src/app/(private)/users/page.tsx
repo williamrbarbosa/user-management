@@ -12,12 +12,15 @@ import {
 import { useEffect, useState } from "react";
 import UserCreateModal from "./CreateModal";
 import UserEditModal from "./EditModal";
+import Tag from "@/components/ui/Tag";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function DashboardPage() {
   const [page, setPage] = useState(1);
   const [userData, setUsers] = useState<UsersData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const queryClient = useQueryClient();
 
   const data = useGetUsers(page);
   const excludeUser = useExcludeUser();
@@ -36,7 +39,14 @@ export default function DashboardPage() {
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this user?")) {
-      await excludeUser(id);
+      excludeUser(id, {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: [`users_list_${page}`],
+            exact: false,
+          });
+        },
+      });
     }
   };
 
@@ -64,6 +74,7 @@ export default function DashboardPage() {
             <tr>
               <th className="px-6 py-4 font-semibold">User</th>
               <th className="px-6 py-4 font-semibold">Email</th>
+              <th className="px-6 py-4 font-semibold">Status</th>
               <th className="px-6 py-4 font-semibold">Created At</th>
               <th className="px-6 py-4 font-semibold">Last Updated At</th>
               <th className="px-6 py-4 font-semibold text-right">Actions</th>
@@ -82,6 +93,9 @@ export default function DashboardPage() {
                 </td>
                 <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
                   {user.email}
+                </td>
+                <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
+                  <Tag colorKey={user.status} text={user.status} grid={true} />
                 </td>
                 <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
                   {user.created_at &&
@@ -142,8 +156,9 @@ export default function DashboardPage() {
 
       {selectedUser && isModalOpen && (
         <UserEditModal
-          id={selectedUser.id || ""}
+          userData={selectedUser}
           isOpen={isModalOpen}
+          page={page}
           onClose={() => setIsModalOpen(false)}
           onEdited={() => {}}
         />
@@ -152,6 +167,7 @@ export default function DashboardPage() {
       {!selectedUser && isModalOpen && (
         <UserCreateModal
           isOpen={isModalOpen}
+          page={page}
           onClose={() => setIsModalOpen(false)}
           onCreated={() => {}}
         />

@@ -17,21 +17,28 @@ import { useCreateUser } from "@/modules/users/hooks/users";
 
 interface UserCreateModalProps {
   isOpen: boolean;
+  page: number;
   onClose: () => void;
   onCreated: (user: User) => void;
 }
 
 const UserCreateModal: React.FC<UserCreateModalProps> = (props) => {
-  const { isOpen, onClose, onCreated } = props;
+  const { isOpen, page, onClose, onCreated } = props;
   const {
     handleSubmit,
     register,
     setValue,
-    watch,
     formState: { errors },
     reset,
   } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      email: "",
+      status: "ACTIVE",
+      password: "",
+    },
   });
   const queryClient = useQueryClient();
 
@@ -49,7 +56,7 @@ const UserCreateModal: React.FC<UserCreateModalProps> = (props) => {
     mutate(user, {
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: [`users_list`],
+          queryKey: [`users_list_${page}`],
           exact: false,
         });
         reset();

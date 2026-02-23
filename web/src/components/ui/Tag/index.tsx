@@ -8,8 +8,8 @@ interface TagProps {
 
 const COLORS = {
   generic: "bg-gray-500 text-white",
-  active: "bg-emerald-500 text-white",
-  inactive: "bg-red-500 text-white",
+  ACTIVE: "bg-emerald-500 text-white",
+  INACTIVE: "bg-red-500 text-white",
 } as {
   [key in string]: string;
 };
