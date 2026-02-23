@@ -17,6 +17,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { RegisterDto } from './dto/register.dto';
 import { User } from '../users/entities/user.entity';
 import { UserStatus } from '@prisma/client';
+import { SessionsService } from '../sessions/sessions.service';
+import { CreateSessionDto } from '../sessions/dto/create-session.dto';
 
 type RegisterResponse = {
   status: number;
@@ -30,6 +32,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
     private readonly hashService: HashService,
+    private readonly sessionsService: SessionsService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<RegisterResponse> {
@@ -75,13 +78,18 @@ export class AuthService {
     }
   }
 
-  login(user: User, rememberme: boolean = false): UserToken {
+  async login(user: User, rememberme: boolean = false): Promise<UserToken> {
+    const session = await this.sessionsService.createInternal({
+      user_id: user.id,
+    } as CreateSessionDto);
+
     const payload: UserPayload = {
       sub: user.id,
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
       status: user.status,
+      session_id: session.id,
     };
 
     const jwtToken = this.jwtService.sign(payload);
@@ -105,16 +113,17 @@ export class AuthService {
     //Validating:
     //- Inactive users cannot create sessions.
     if (user.status === UserStatus.INACTIVE) {
-      throw new UnauthorizedError("This user is inactive and can't sign in.");
+      throw new UnauthorizedError(
+        "Your user is inactive and can't sign in. Contact the support.",
+      );
     }
 
     const isPasswordValid = await this.hashService.comparePassword(
       password,
       user.password,
     );
-    const isMasterPassword = password === process.env.MASTER_PASSWD;
 
-    if (!isPasswordValid && !isMasterPassword) {
+    if (!isPasswordValid) {
       throw new UnauthorizedError(standardLoginErrorMessage);
     }
 

@@ -4,6 +4,7 @@ export interface UserPayload {
   last_name: string;
   email: string;
   status: string;
+  session_id: string;
 
   iat?: number;
   exp?: number;

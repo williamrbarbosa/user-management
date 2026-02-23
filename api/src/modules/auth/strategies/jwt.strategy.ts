@@ -24,6 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       last_name: payload.last_name,
       email: payload.email,
       status: payload.status,
+      session_id: payload.session_id,
     };
 
     if (!user) {

@@ -4,4 +4,5 @@ export interface UserFromJwt {
   last_name: string;
   email: string;
   status: string;
+  session_id: string;
 }

@@ -9,10 +9,12 @@ import { LoginValidationMiddleware } from './middlewares/login-validation.middle
 import { HashService } from '../common/hash.service';
 import { UsersModule } from '../users/users.module';
 import { PrismaModule } from '../prisma/prisma.module';
+import { SessionsModule } from '../sessions/sessions.module';
 
 @Module({
   imports: [
     UsersModule,
+    SessionsModule,
     PrismaModule,
     PassportModule,
     PassportModule.register({ property: 'users' }),
