@@ -18,18 +18,6 @@ export class SessionsRepository {
     });
   }
 
-  findAll(skip: number = 0, take: number = 6): Promise<Session[] | []> {
-    return this.prismaService.sessions.findMany({
-      skip,
-      take,
-      orderBy: { created_at: 'desc' },
-    });
-  }
-
-  count() {
-    return this.prismaService.sessions.count();
-  }
-
   findById(id: string): Promise<Session | null> {
     return this.prismaService.sessions.findUnique({ where: { id } });
   }

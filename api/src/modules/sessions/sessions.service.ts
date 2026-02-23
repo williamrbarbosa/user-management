@@ -6,16 +6,20 @@ import {
 } from '@nestjs/common';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { Session } from './entities/session.entity';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { SessionsRepository } from './sessions.repository';
 import { AppError } from '../common/models';
-import { Prisma } from '@prisma/client';
+import { Prisma, UserStatus } from '@prisma/client';
+import { UsersRepository } from '../users/users.repository';
 
 @Injectable()
 export class SessionsService {
-  constructor(private readonly sessionsRepository: SessionsRepository) {}
+  constructor(
+    private readonly sessionsRepository: SessionsRepository,
+    private readonly usersRepository: UsersRepository,
+  ) {}
 
-  async create(createSessionDto: CreateSessionDto): Promise<Session> {
+  async createInternal(createSessionDto: CreateSessionDto): Promise<Session> {
     const { user_id, ...sessionDto } = createSessionDto;
 
     const session = await this.findActiveByUserId(user_id);
@@ -23,9 +27,19 @@ export class SessionsService {
       throw new ConflictException('This user already has an active Session.');
     }
 
+    const user = await this.usersRepository.findById(user_id);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.status === UserStatus.INACTIVE) {
+      throw new BadRequestException('Inactive users cannot create sessions.');
+    }
+
     const data: Prisma.sessionsCreateInput = {
       ...sessionDto,
-      id: uuidv4(),
+      id: randomUUID(),
       user: {
         connect: {
           id: user_id,
@@ -46,10 +60,12 @@ export class SessionsService {
     }
   }
 
-  async terminateSession(user_id: string): Promise<Session> {
+  async terminate(user_id: string): Promise<Session> {
     const session = await this.findActiveByUserId(user_id);
     if (!session) {
-      throw new ConflictException('There is no active Session for this user.');
+      throw new BadRequestException(
+        'There is no active Session for this user.',
+      );
     }
 
     try {
