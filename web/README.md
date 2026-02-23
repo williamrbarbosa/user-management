@@ -1,36 +1,138 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🖥️ User Management — Web
 
-## Getting Started
+Frontend of the user management application, built with **Next.js 15** and **TypeScript**. Consumes the [REST API](../api) for authentication and CRUD operations.
 
-First, run the development server:
+---
+
+## 🧱 Tech Stack
+
+| Technology           | Purpose                                     |
+| -------------------- | ------------------------------------------- |
+| **Next.js 15+**      | React framework with App Router             |
+| **TypeScript 5+**    | Static typing                               |
+| **Tailwind CSS**     | Utility-first styling                       |
+| **React Hook Form**  | Form state management                       |
+| **Zod**              | Schema validation                           |
+| **TanStack Query**   | Server state management                     |
+| **Headless UI**      | Accessible components (modals, transitions) |
+| **Heroicons**        | Icons                                       |
+| **Playwright 1.50+** | End-to-end testing                          |
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── app/                   # App Router (pages and layouts)
+│   ├── (public)/          # Public routes (login)
+│   └── (private)/         # Protected routes (dashboard)
+├── components/            # Reusable UI components
+│   ├── form/              # Input, Select, Label, etc.
+│   └── ui/                # Tag, Loader, Toast, etc.
+├── modules/               # Feature modules
+│   ├── auth/              # Login, hooks and auth service
+│   └── users/             # List, modals, hooks and users service
+├── schemas/               # Zod validation schemas
+├── store/                 # Global state (Zustand)
+└── helpers/               # Utilities and helper functions
+```
+
+---
+
+## 🚀 Running Locally
+
+> **Recommended:** use Docker Compose from the repository root to spin up all services together.
+> See the [main README](../README.md) for full instructions.
+
+To run the frontend in isolation:
+
+### Prerequisites
+
+- Node.js 22+
+- API running at `http://localhost:3000`
+
+### Installation
+
+```bash
+cd web
+npm install
+```
+
+### Environment Variables
+
+Create a `.env.local` file:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+### Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Access at: **http://localhost:3001**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Production Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🔐 Authentication
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The authentication flow works as follows:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. User submits email and password on the login form
+2. The API returns a **JWT token**
+3. The token is stored and sent on every request via the `Authorization: Bearer <token>` header
+4. Protected routes redirect to `/login` if the token is invalid or missing
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📋 Features
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Login with email and password
+- User listing with pagination
+- Create new users
+- Edit existing users
+- Delete users (cannot delete your own account)
+- Status management — Active / Inactive
+- Form validation with real-time feedback
+- Success and error toast notifications
+- Global loader for in-flight requests
+- Dark mode support
+
+---
+
+## 🧪 Testing
+
+End-to-end tests are written with **Playwright**.
+
+```bash
+# Run all tests
+npx playwright test
+
+# Run with visual UI
+npx playwright test --ui
+
+# Run a specific file
+npx playwright test tests/users.spec.ts
+```
+
+---
+
+## 🛠 Available Scripts
+
+```bash
+npm run dev         # Start the development server
+npm run build       # Generate the production build
+npm start           # Start the production server
+npm run lint        # Run ESLint
+npx playwright test # Run E2E tests
+```
