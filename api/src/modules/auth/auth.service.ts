@@ -8,7 +8,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedError } from './errors/unauthorized.error';
 import { UserPayload } from './models/UserPayload';
-import { UserToken } from './models/UserToken';
+import { UserResponseLogin } from './models/UserResponseLogin';
 import { UsersService } from 'src/modules/users/users.service';
 import { HashService } from 'src/modules/common/hash.service';
 import { AppError } from 'src/modules/common/models';
@@ -19,6 +19,7 @@ import { User } from '../users/entities/user.entity';
 import { UserStatus } from '@prisma/client';
 import { SessionsService } from '../sessions/sessions.service';
 import { CreateSessionDto } from '../sessions/dto/create-session.dto';
+import { Session } from '../sessions/entities/session.entity';
 
 type RegisterResponse = {
   status: number;
@@ -65,8 +66,7 @@ export class AuthService {
       return {
         status: 200,
         email: maskedEmail,
-        message:
-          'Registro realizado com sucesso. Por favor, verifique seu e-mail para ativar sua conta.',
+        message: 'Your account was created successfully.',
       };
     } catch (err) {
       const error = err as AppError;
@@ -78,7 +78,10 @@ export class AuthService {
     }
   }
 
-  async login(user: User, rememberme: boolean = false): Promise<UserToken> {
+  async login(
+    user: User,
+    rememberme: boolean = false,
+  ): Promise<UserResponseLogin> {
     const session = await this.sessionsService.createInternal({
       user_id: user.id,
     } as CreateSessionDto);
@@ -98,7 +101,15 @@ export class AuthService {
       tokenType: 'Bearer',
       expiresIn: rememberme ? 86400 : 3600,
       accessToken: jwtToken,
+      sessionId: session.id,
+      user: user,
     };
+  }
+
+  async logout(user: User): Promise<Session> {
+    const session = await this.sessionsService.terminate(user.id);
+
+    return session;
   }
 
   async validateUser(email: string, password: string): Promise<User> {

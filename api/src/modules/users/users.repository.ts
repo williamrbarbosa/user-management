@@ -15,6 +15,14 @@ export class UsersRepository {
     return this.prismaService.users.update({ where: { id }, data });
   }
 
+  updateLoginCount(id: string, userLoginCount: number): Promise<User> {
+    const loginCount = userLoginCount + 1;
+    return this.prismaService.users.update({
+      where: { id },
+      data: { login_count: loginCount },
+    });
+  }
+
   delete(id: string): Promise<User> {
     return this.prismaService.users.delete({ where: { id } });
   }
@@ -23,7 +31,7 @@ export class UsersRepository {
     return this.prismaService.users.findMany({
       skip,
       take,
-      orderBy: { created_at: 'desc' },
+      orderBy: [{ first_name: 'asc' }, { last_name: 'asc' }],
     });
   }
 

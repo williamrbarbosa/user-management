@@ -111,13 +111,11 @@ export class UsersService {
     }
   }
 
-  async findAll(
-    page: number = 1,
-    limit: number = 6,
-  ): Promise<{
+  async findAll(page: number = 1): Promise<{
     data: User[];
     meta: { total: number; page: number; lastPage: number };
   }> {
+    const limit: number = 6;
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([

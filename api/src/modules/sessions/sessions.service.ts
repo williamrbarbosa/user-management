@@ -42,7 +42,7 @@ export class SessionsService {
       id: randomUUID(),
       user: {
         connect: {
-          id: user_id,
+          id: user.id,
         },
       },
       created_at: new Date(),
@@ -50,7 +50,13 @@ export class SessionsService {
     };
 
     try {
-      return this.sessionsRepository.create(data);
+      const session = await this.sessionsRepository.create(data);
+
+      if (session) {
+        await this.usersRepository.updateLoginCount(user.id, user.login_count);
+      }
+
+      return session;
     } catch (err) {
       const error = err as AppError;
       throw new BadRequestException(

@@ -23,6 +23,34 @@ async function bootstrap() {
 
   app.enableShutdownHooks();
 
+  const allowedOrigins = ['http://localhost:3001'];
+
+  app.enableCors({
+    origin: (origin, callback) => {
+      // Allow calls without an orgigin (e.g: cURL ou Postman)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(
+          new Error(`Origin ${origin} not allowed by CORS`),
+          false,
+        );
+      }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'SessionId',
+      'process-data',
+      'preflight',
+    ],
+    credentials: true, // to send cookies
+  });
+
   // Swagger Settings
   const config = new DocumentBuilder()
     .setTitle('Users Management System API')
