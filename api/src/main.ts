@@ -23,7 +23,7 @@ async function bootstrap() {
 
   app.enableShutdownHooks();
 
-  const allowedOrigins = ['http://localhost:3001'];
+  const allowedOrigins = ['http://localhost:3000'];
 
   app.enableCors({
     origin: (origin, callback) => {
@@ -62,6 +62,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document); // access by /docs
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();

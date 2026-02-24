@@ -50,7 +50,7 @@ To run the frontend in isolation:
 ### Prerequisites
 
 - Node.js 22+
-- API running at `http://localhost:3000`
+- API running at `http://localhost:3001`
 
 ### Installation
 
@@ -64,7 +64,7 @@ npm install
 Create a `.env.local` file:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
 ### Development
@@ -73,7 +73,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 npm run dev
 ```
 
-Access at: **http://localhost:3001**
+Access at: **http://localhost:3000**
 
 ### Production Build
 
@@ -135,6 +135,7 @@ npm run build       # Generate the production build
 npm start           # Start the production server
 npm run lint        # Run ESLint
 npx playwright test # Run E2E tests
+npx playwright test --ui # Run E2E tests with UI
 ```
 
 ## License

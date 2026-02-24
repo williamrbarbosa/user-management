@@ -8,8 +8,6 @@ export function middleware(request: NextRequest) {
   const LOGIN_PAGE = new URL("/login", request.url);
   const HOME_PAGE = new URL("/users", request.url);
 
-  console.log("[middleware]", pathname, "| token:", !!token);
-
   // If you don't have a token and try to access a private route
   if (!token && !isAuthPage) {
     return NextResponse.redirect(LOGIN_PAGE);

@@ -58,7 +58,7 @@ export default function RegisterPage() {
       const success = await login(authLogin);
       if (success) {
         setLoading(false);
-        router.push("/dashboard");
+        router.push("/home");
       } else {
         router.push("/login");
       }

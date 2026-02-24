@@ -11,8 +11,8 @@ export const registerSchema = z
       .min(2, "Last name is required")
       .max(40, "Last name must have less then 40 characters"),
     email: z.string().email("Invalid email"),
-    user_password: z.string().min(8, "Minimum 8 characters"),
-    user_confirm_password: z.string().min(8),
+    user_password: z.string().min(6, "Minimum 6 characters"),
+    user_confirm_password: z.string().min(6),
   })
   .refine((data) => data.user_password === data.user_confirm_password, {
     message: "Passwords does not match",

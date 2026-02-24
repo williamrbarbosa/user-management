@@ -25,18 +25,15 @@ services:
     container_name: user-management-api
     restart: always
     ports:
-      - "3000:3000"
+      - "3001:3001"
     environment:
-      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
-      REDIS_URL: "redis://redis:6379"
-      NODE_ENV: development
-      JWT_SECRET: "HkG+0L60Hn1s1+NpYnbvawKnCvk2S6ziZNNwTdiFym8="
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://redis:6379
+      - NODE_ENV=production
+      - JWT_SECRET=HkG+0L60Hn1s1+NpYnbvawKnCvk2S6ziZNNwTdiFym8=
     depends_on:
       - postgres
       - redis
-    volumes:
-      - ./api:/app
-      - /app/node_modules
 
   web:
     build:
@@ -45,9 +42,11 @@ services:
     container_name: user-management-web
     restart: always
     ports:
-      - "3001:3001"
+      - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:3000
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      - WATCHPACK_POLLING=true
     depends_on:
       - api
     volumes:

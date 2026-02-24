@@ -68,6 +68,8 @@ DATABASE_URL=postgresql://postgres:yourpassword@localhost:5432/user_management
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=your_jwt_secret
 NODE_ENV=development
+PORT=3001
+SESSION_TTL=86400
 ```
 
 ### Database Setup
@@ -89,7 +91,8 @@ npx prisma db seed
 npm run start:dev
 ```
 
-API running at: **http://localhost:3000**
+API running at: **http://localhost:3001**
+Swagger running at: **http://localhost:3001/docs**
 
 ---
 
@@ -136,7 +139,7 @@ Protected endpoints return `401 Unauthorized` if the token is missing, expired, 
 | PUT    | `/users/:id` | Update an existing user    |
 | DELETE | `/users/:id` | Delete a user              |
 
-> Full interactive documentation available at **http://localhost:3000/api** (Swagger UI).
+> Full interactive documentation available at **http://localhost:3001/docs** (Swagger UI).
 
 ---
 

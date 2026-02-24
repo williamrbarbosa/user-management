@@ -61,10 +61,16 @@ export default function PrivateLayout({
 
               <div className="flex items-center gap-3 pr-6 border-r border-gray-100">
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 leading-none">
+                  <p
+                    className="text-sm font-medium text-gray-900 dark:text-gray-100 leading-none"
+                    aria-label="user name"
+                  >
                     {user?.last_name}, {user?.first_name}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-200 mt-1">
+                  <p
+                    className="text-xs text-gray-500 dark:text-gray-200 mt-1"
+                    aria-label="user email"
+                  >
                     {user?.email}
                   </p>
                 </div>
@@ -77,6 +83,7 @@ export default function PrivateLayout({
 
               <button
                 onClick={() => logout()}
+                aria-label="logout button"
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-500 hover:bg-red-50 hover:text-red-600 rounded-md transition-all duration-200 border border-transparent hover:border-red-100 cursor-pointer"
               >
                 <ArrowLeftStartOnRectangleIcon className="w-5 h-5" />

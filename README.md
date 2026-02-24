@@ -68,8 +68,8 @@ docker compose up --build
 
 | Service  | URL                   |
 | -------- | --------------------- |
-| Web      | http://localhost:3001 |
-| API      | http://localhost:3000 |
+| Web      | http://localhost:3000 |
+| API      | http://localhost:3001 |
 | Postgres | localhost:5433        |
 | Redis    | localhost:6379        |
 
