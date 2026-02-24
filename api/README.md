@@ -1,96 +1,183 @@
-# User Management Platform – Backend API
+# 🛠️ User Management — API
 
-This project is the backend API for the **User Management Platform**, a back-office user management system designed to manage users and sessions in a scalable, secure, and production-ready environment.
-
-The API is built using **NestJS**, **TypeScript**, **PostgreSQL**, and **Redis**, following modern software engineering best practices, including modular architecture, automated testing, and containerized infrastructure.
-
-1. [Tech Stack](#tech-stack)
-2. [Architecture Overview](#architecture-overview)
-3. [Main Principles](#main-principles)
-4. [Local Setup](#local-setup)
+Backend REST API of the user management application, built with **NestJS** and **TypeScript**. Handles authentication, user CRUD operations, and session management in a modular, scalable, and production-ready architecture.
 
 ---
 
-## Tech Stack
+## 🧱 Tech Stack
 
-- **Node.js 22+**
-- **TypeScript 5+**
-- **NestJS**
-- **PostgreSQL**
-- **Redis**
-- **Prisma ORM**
-- **Docker & Docker Compose**
-- **Jest & Supertest (testing)**
+| Technology                  | Purpose                      |
+| --------------------------- | ---------------------------- |
+| **Node.js 22+**             | Runtime environment          |
+| **TypeScript 5+**           | Static typing                |
+| **NestJS**                  | Modular backend framework    |
+| **Prisma ORM**              | Type-safe database access    |
+| **PostgreSQL 16**           | Relational database          |
+| **Redis 7**                 | Session and cache layer      |
+| **JWT**                     | Stateless authentication     |
+| **Jest + Supertest**        | Unit and integration testing |
+| **Docker + Docker Compose** | Containerized infrastructure |
+| **Swagger (OpenAPI)**       | API documentation            |
 
 ---
 
-## Architecture Overview
+## 📁 Project Structure
 
-The application follows a modular and scalable architecture:
+```
 src/
-├── modules/
-│ ├── users/
-│ ├── sessions/
-│ ├── auth/
-│ ├── health/
-│ ├── prisma/
-│ ├── common/
-│ │ ├── decorators/
-│ │ └── models/
-└── main.ts
-
-### Main Principles
-
-- Modular design for scalability
-- Clean separation of concerns
-- Domain-driven validations
-- Centralized error handling
-- Fully containerized setup
+├── auth/                  # Authentication module (login, JWT strategy)
+├── users/                 # Users module (CRUD, validations)
+├── sessions/              # Session management
+├── health/                # Health check endpoint
+├── prisma/                # Prisma service and client setup
+└── common/
+    ├── decorators/        # Custom decorators (e.g. @User())
+    ├── guards/            # Auth guards
+    ├── models/            # Shared types and interfaces
+    └── hash.service.ts    # Password hashing utility
+```
 
 ---
 
-## Local Setup
+## 🚀 Running Locally
+
+> **Recommended:** use Docker Compose from the repository root to spin up all services together.
+> See the [main README](../README.md) for full instructions.
+
+To run the API in isolation:
 
 ### Prerequisites
 
-Make sure you have installed:
+- Node.js 22+
+- PostgreSQL instance running
+- Redis instance running
 
-- Docker
-- Docker Compose
+### Installation
+
+```bash
+cd api
+npm install
+```
+
+### Environment Variables
+
+Create a `.env` file:
+
+```env
+DATABASE_URL=postgresql://postgres:yourpassword@localhost:5432/user_management
+REDIS_URL=redis://localhost:6379
+JWT_SECRET=your_jwt_secret
+NODE_ENV=development
+```
+
+### Database Setup
+
+```bash
+# Apply migrations
+npx prisma migrate dev
+
+# Generate Prisma client
+npx prisma generate
+
+# Seed initial data
+npx prisma db seed
+```
+
+### Development
+
+```bash
+npm run start:dev
+```
+
+API running at: **http://localhost:3000**
 
 ---
 
-### 1. Clone the repository
+## 🌱 Seed Data
 
-git clone https://github.com/williamrbarbosa/user-management
-cd user-management-platform
+After running the seed, the following users are available:
 
-### 2. Install dependecies
-
-docker-compose exec api npm install
-
-### 3. Generate database and seed data
-
-docker-compose exec api npx prisma db push
-docker-compose exec api npx prisma generate
-docker-compose exec api npx prisma db seed
-
-### 4. Start Application
-
-docker-compose exec api npm run start
-
-### 5. Run unit tests
-
-docker-compose exec api npm run test
+| Name         | Email              | Password  | Status |
+| ------------ | ------------------ | --------- | ------ |
+| System Admin | admin@company.com  | Admin@123 | Active |
+| John Doe     | john.doe@gmail.com | Admin@123 | Active |
+| Jane Doe     | jane.doe@gmail.com | Admin@123 | Active |
 
 ---
 
-## License
+## 🔐 Authentication
 
-Proprietary - All right reserved to William Barbosa
+Authentication is handled via **email and password**. On a successful login, the API returns a signed **JWT token** which must be sent on all protected requests:
+
+```
+Authorization: Bearer <token>
+```
+
+Protected endpoints return `401 Unauthorized` if the token is missing, expired, or invalid.
 
 ---
 
-**Version:** 1.0.0
-**last Update:** Feb 2026
+## 📋 API Endpoints
+
+### Auth
+
+| Method | Endpoint       | Description                          |
+| ------ | -------------- | ------------------------------------ |
+| POST   | `/auth/login`  | Authenticate and receive a JWT token |
+| POST   | `/auth/logout` | Invalidate the current session       |
+
+### Users
+
+| Method | Endpoint     | Description                |
+| ------ | ------------ | -------------------------- |
+| GET    | `/users`     | List all users (paginated) |
+| GET    | `/users/:id` | Get a user by ID           |
+| POST   | `/users`     | Create a new user          |
+| PUT    | `/users/:id` | Update an existing user    |
+| DELETE | `/users/:id` | Delete a user              |
+
+> Full interactive documentation available at **http://localhost:3000/api** (Swagger UI).
+
+---
+
+## 🧪 Testing
+
+Unit and integration tests are written with **Jest** and **Supertest**.
+
+```bash
+# Run all tests
+npm run test
+
+# Run with coverage report
+npm run test:cov
+
+# Run in watch mode
+npm run test:watch
+```
+
+---
+
+## 🛠 Available Scripts
+
+```bash
+npm run start:dev    # Start in development mode (watch)
+npm run start:prod   # Start in production mode
+npm run build        # Compile TypeScript
+npm run lint         # Run ESLint
+npm run test         # Run unit tests
+npm run test:cov     # Run tests with coverage
+npx prisma studio    # Open Prisma Studio (database GUI)
+npx prisma db seed   # Seed the database
+```
+
+---
+
+## 📄 License
+
+Proprietary — All rights reserved to William Barbosa.
+
+---
+
+**Version:** 1.0.0  
+**Last Update:** Feb 2026  
 **Developed by:** William Barbosa

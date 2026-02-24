@@ -136,3 +136,13 @@ npm start           # Start the production server
 npm run lint        # Run ESLint
 npx playwright test # Run E2E tests
 ```
+
+## License
+
+Proprietary - All right reserved to William Barbosa
+
+---
+
+**Version:** 1.0.0
+**last Update:** Feb 2026
+**Developed by:** William Barbosa
