@@ -171,11 +171,11 @@ describe('UsersService', () => {
     usersRepositoryMock.findAll.mockResolvedValue([{ id: userId }]);
     usersRepositoryMock.count.mockResolvedValue(1);
 
-    const result = await service.findAll(1, 10);
+    const result = await service.findAll(1);
 
     expect(result.data.length).toBe(1);
     expect(result.meta.total).toBe(1);
     expect(result.meta.page).toBe(1);
-    expect(usersRepositoryMock.findAll).toHaveBeenCalledWith(0, 10);
+    expect(usersRepositoryMock.findAll).toHaveBeenCalledWith(0, 6);
   });
 });

@@ -1,9 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  ConflictException,
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { SessionsService } from '../sessions.service';
 import { SessionsRepository } from '../sessions.repository';
 import { randomUUID } from 'crypto';
@@ -37,6 +33,7 @@ describe('SessionsService', () => {
           provide: UsersRepository,
           useValue: {
             findById: jest.fn(),
+            updateLoginCount: jest.fn(),
           },
         },
       ],
