@@ -13,11 +13,11 @@ import FormUser from "../FormUser";
 import { User } from "@/modules/users/users.service";
 import { CircleStackIcon, PencilIcon } from "@heroicons/react/24/outline";
 import { UserFormData, userSchema } from "@/schemas/user.schema";
-import { useEditUser } from "@/modules/users/hooks/users";
+import { useEditUser, useGetUserById } from "@/modules/users/hooks/users";
 import Tag from "@/components/ui/Tag";
 
 interface UserEditModalProps {
-  userData: User;
+  user: User;
   isOpen: boolean;
   page: number;
   onClose: () => void;
@@ -25,7 +25,7 @@ interface UserEditModalProps {
 }
 
 const UserEditModal: React.FC<UserEditModalProps> = (props) => {
-  const { userData, isOpen, page, onClose, onEdited } = props;
+  const { user, isOpen, page, onClose, onEdited } = props;
 
   const {
     handleSubmit,
@@ -36,17 +36,21 @@ const UserEditModal: React.FC<UserEditModalProps> = (props) => {
   } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
     defaultValues: {
-      first_name: userData.first_name,
-      last_name: userData.last_name,
-      email: userData.email,
-      status: userData.status,
-      password: userData.password,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      status: user.status,
+      password: user.password,
     },
   });
+
+  const userData = useGetUserById(user.id!, {
+    initialData: user,
+  });
+  const sessions = userData?.sessions ?? [];
+
+  const mutate = useEditUser(user.id!, onEdited);
   const queryClient = useQueryClient();
-
-  const mutate = useEditUser(userData.id!, onEdited);
-
   const idForm = "edit-user";
 
   const onSubmit: SubmitHandler<UserFormData> = (formValues) => {
@@ -57,7 +61,7 @@ const UserEditModal: React.FC<UserEditModalProps> = (props) => {
     mutate(user, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [`users_list`, page] });
-        queryClient.invalidateQueries({ queryKey: [`user`, userData.id!] });
+        queryClient.invalidateQueries({ queryKey: [`user`, user.id!] });
         reset();
         onClose();
       },
@@ -145,6 +149,75 @@ const UserEditModal: React.FC<UserEditModalProps> = (props) => {
                         <CircleStackIcon className="w-4 h-4" /> Save
                       </button>
                     </div>
+
+                    {/* user's sessions table (further implementation example) */}
+                    {sessions && (
+                      <div className="p-5 bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm">
+                        <p className="text-gray-500 dark:text-gray-400 text-start">
+                          User last Sessions
+                        </p>
+                        <table className="w-full text-left border-collapse">
+                          <thead className="bg-gray-50 dark:bg-zinc-800/50 text-gray-600 dark:text-gray-300">
+                            <tr>
+                              <th className="px-6 py-4 font-semibold text-xs">
+                                ID
+                              </th>
+                              <th className="px-6 py-4 font-semibold text-xs">
+                                Created At
+                              </th>
+                              <th className="px-6 py-4 font-semibold text-xs">
+                                Terminated At
+                              </th>
+                              <th className="px-6 py-4 font-semibold text-xs">
+                                Status
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
+                            {sessions?.map((session) => {
+                              const sessionStatus = !session.terminated_at
+                                ? "ACTIVE"
+                                : "INACTIVE";
+                              return (
+                                <tr
+                                  key={session.id}
+                                  className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors"
+                                >
+                                  <td className="px-6 py-4">
+                                    <span className="font-medium text-xs">
+                                      {session.id}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs">
+                                    {session.created_at &&
+                                      new Intl.DateTimeFormat("en-US", {
+                                        dateStyle: "short",
+                                        timeStyle: "short",
+                                      }).format(new Date(session.created_at))}
+                                  </td>
+                                  <td className="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs">
+                                    {session.terminated_at &&
+                                      new Intl.DateTimeFormat("en-US", {
+                                        dateStyle: "short",
+                                        timeStyle: "short",
+                                      }).format(
+                                        new Date(session.terminated_at),
+                                      )}
+                                  </td>
+                                  <td className="px-6 py-4 text-gray-500 dark:text-gray-400 text-xs">
+                                    <Tag
+                                      colorKey={sessionStatus}
+                                      text={sessionStatus}
+                                      grid={true}
+                                    />
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Dialog.Panel>

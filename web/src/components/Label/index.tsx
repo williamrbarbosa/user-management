@@ -12,7 +12,7 @@ const Label: React.FC<LabelProps> = (props) => {
     <div className="mb-0 flex items-center gap-2">
       <label
         htmlFor={`${id}_label`}
-        className={`${className} block text-sm leading-6 text-gray-700`}
+        className={`${className} block text-sm leading-6 text-gray-700 dark:text-gray-100`}
       >
         {text}
       </label>

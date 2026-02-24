@@ -8,6 +8,8 @@ export function middleware(request: NextRequest) {
   const LOGIN_PAGE = new URL("/login", request.url);
   const HOME_PAGE = new URL("/users", request.url);
 
+  console.log("[middleware]", pathname, "| token:", !!token);
+
   // If you don't have a token and try to access a private route
   if (!token && !isAuthPage) {
     return NextResponse.redirect(LOGIN_PAGE);
@@ -23,18 +25,5 @@ export function middleware(request: NextRequest) {
 
 // Defines which routes the middleware should observe.
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths EXCEPT:
-     * - _next/static (static files)
-     * - _next/image (image optimization)
-     * - favicon.ico
-     * - public folder files
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-    "/login",
-    "/register",
-    "/users/:path*",
-    "/dashboard/:path*",
-  ],
+  matcher: ["/login", "/register", "/users/:path*", "/dashboard/:path*"],
 };

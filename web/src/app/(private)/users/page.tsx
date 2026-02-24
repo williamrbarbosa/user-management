@@ -157,7 +157,7 @@ export default function DashboardPage() {
       {selectedUser && isModalOpen && (
         <UserEditModal
           key={selectedUser.id!}
-          userData={selectedUser}
+          user={selectedUser}
           isOpen={isModalOpen}
           page={page}
           onClose={() => setIsModalOpen(false)}

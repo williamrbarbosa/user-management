@@ -108,7 +108,10 @@ export const useCreateUser = (onCreated?: (user: User) => void) => {
   return mutate;
 };
 
-export const useGetUserById = (id: string) => {
+export const useGetUserById = (
+  id: string,
+  options?: { initialData?: User },
+) => {
   const { setLoader, setToast } = useAppStore();
 
   const { data, isError, isLoading } = useQuery<User, Error>({
