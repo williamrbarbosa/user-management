@@ -14,6 +14,15 @@ export type User = {
 
   created_at?: Date;
   updated_at?: Date;
+
+  sessions?: Session[];
+};
+
+type Session = {
+  id: string;
+  user_id: string;
+  created_at: Date;
+  terminated_at?: Date | null;
 };
 
 export type UsersData = {

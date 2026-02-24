@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -13,7 +13,8 @@ import FormUser from "../FormUser";
 import { User } from "@/modules/users/users.service";
 import { CircleStackIcon, PencilIcon } from "@heroicons/react/24/outline";
 import { UserFormData, userSchema } from "@/schemas/user.schema";
-import { useEditUser, useGetUserById } from "@/modules/users/hooks/users";
+import { useEditUser } from "@/modules/users/hooks/users";
+import Tag from "@/components/ui/Tag";
 
 interface UserEditModalProps {
   userData: User;
@@ -39,6 +40,7 @@ const UserEditModal: React.FC<UserEditModalProps> = (props) => {
       last_name: userData.last_name,
       email: userData.email,
       status: userData.status,
+      password: userData.password,
     },
   });
   const queryClient = useQueryClient();
@@ -54,10 +56,8 @@ const UserEditModal: React.FC<UserEditModalProps> = (props) => {
 
     mutate(user, {
       onSuccess: () => {
-        void queryClient.invalidateQueries({
-          queryKey: [`users_list_${page}`],
-          exact: false,
-        });
+        queryClient.invalidateQueries({ queryKey: [`users_list`, page] });
+        queryClient.invalidateQueries({ queryKey: [`user`, userData.id!] });
         reset();
         onClose();
       },
@@ -125,16 +125,18 @@ const UserEditModal: React.FC<UserEditModalProps> = (props) => {
 
                 <div className="p-2 space-y-2">
                   <div className="w-full h-full">
-                    <FormUser
-                      idForm={idForm}
-                      handleSubmit={handleSubmit}
-                      onSubmit={onSubmit}
-                      register={register}
-                      setValue={setValue}
-                      errors={errors}
-                    />
+                    {userData && (
+                      <FormUser
+                        idForm={idForm}
+                        handleSubmit={handleSubmit}
+                        onSubmit={onSubmit}
+                        register={register}
+                        setValue={setValue}
+                        errors={errors}
+                      />
+                    )}
 
-                    <div className="h-auto justify-end items-end flex flex-row gap-2 p-4 pb-1 border-t border-gray-300">
+                    <div className="h-auto justify-end items-end flex flex-row gap-2 p-4 border-y border-gray-300">
                       <button
                         type="submit"
                         form={idForm}

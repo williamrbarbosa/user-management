@@ -71,17 +71,16 @@ const FormUser: React.FC<FormUserProps> = (props) => {
             label="Email"
             type="email"
           />
-          {idForm === "create-user" && (
-            <Form.Input
-              register={register("password")}
-              errors={errors}
-              field="password"
-              placeholder="Password"
-              required
-              label="Password"
-              type="password"
-            />
-          )}
+
+          <Form.Input
+            register={register("password")}
+            errors={errors}
+            field="password"
+            placeholder="Password"
+            required
+            label="Password (mín. 6 characteres, only type if you wanna change it)"
+            type="password"
+          />
         </Form.Item>
 
         <Form.Item>

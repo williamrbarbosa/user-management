@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { messages } from "@/config/messages";
 import { useAppStore } from "@/store";
@@ -12,7 +12,7 @@ export const useGetUsers = (page: number) => {
   const { setLoader, setToast } = useAppStore();
 
   const { data, isError, isLoading } = useQuery<UsersData, Error>({
-    queryKey: [`${QUERY_KEY_LIST}_${page}`],
+    queryKey: [QUERY_KEY_LIST, page],
     queryFn: async () => {
       setLoader(true);
       const response = await usersService.getUsers(page);
@@ -49,7 +49,6 @@ export const useGetUsers = (page: number) => {
 
 export const useExcludeUser = () => {
   const { setLoader, setToast } = useAppStore();
-  const queryClient = useQueryClient();
 
   const { mutate } = useMutation({
     mutationFn: (id: string) => {
@@ -57,15 +56,9 @@ export const useExcludeUser = () => {
       return usersService.delete(id);
     },
     onSuccess: (resp) => {
-      void queryClient.invalidateQueries({
-        queryKey: [QUERY_KEY_LIST],
-      });
-
       setToast({
         show: true,
-
         type: resp.data.error ? "error" : "success",
-
         message: resp.data.message || messages.USER_DELETE_SUCCESS_MESSAGE,
       });
       setTimeout(() => {
@@ -87,7 +80,6 @@ export const useExcludeUser = () => {
 
 export const useCreateUser = (onCreated?: (user: User) => void) => {
   const { setLoader, setToast } = useAppStore();
-  const queryClient = useQueryClient();
 
   const { mutate } = useMutation({
     mutationFn: async (payload: User) => {
@@ -95,14 +87,9 @@ export const useCreateUser = (onCreated?: (user: User) => void) => {
       return usersService.create(payload);
     },
     onSuccess: (resp) => {
-      void queryClient.invalidateQueries({
-        queryKey: [QUERY_KEY_LIST],
-      });
       setToast({
         show: true,
-
         type: resp.data.error ? "error" : "success",
-
         message: resp.data.message || messages.USER_CREATE_SUCCESS_MESSAGE,
       });
       onCreated?.(resp.data as User);
@@ -125,12 +112,13 @@ export const useGetUserById = (id: string) => {
   const { setLoader, setToast } = useAppStore();
 
   const { data, isError, isLoading } = useQuery<User, Error>({
-    queryKey: [`${QUERY_KEY}_${id}`],
+    queryKey: [QUERY_KEY, id],
     queryFn: async () => {
       const response = await usersService.getUserById(id);
       return response.data;
     },
     enabled: !!id,
+    staleTime: 0,
   });
 
   useEffect(() => {
@@ -159,7 +147,6 @@ export const useGetUserById = (id: string) => {
 
 export const useEditUser = (id: string, onEdited?: (user: User) => void) => {
   const { setLoader, setToast } = useAppStore();
-  const queryClient = useQueryClient();
 
   const { mutate } = useMutation({
     mutationFn: (payload: User) => {
@@ -167,14 +154,9 @@ export const useEditUser = (id: string, onEdited?: (user: User) => void) => {
       return usersService.update(id, payload);
     },
     onSuccess: (resp) => {
-      void queryClient.invalidateQueries({
-        queryKey: [QUERY_KEY_LIST, `${QUERY_KEY}_${id}`],
-      });
       setToast({
         show: true,
-
         type: resp.data.error ? "error" : "success",
-
         message: resp.data.message || messages.USER_EDIT_SUCCESS_MESSAGE,
       });
       onEdited?.(resp.data as User);

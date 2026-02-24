@@ -43,6 +43,13 @@ export class UsersRepository {
     return this.prismaService.users.findUnique({ where: { id } });
   }
 
+  findByIdWithSessions(id: string): Promise<User | null> {
+    return this.prismaService.users.findUnique({
+      where: { id },
+      include: { sessions: { take: 6, orderBy: { created_at: 'desc' } } },
+    });
+  }
+
   findByEmail(email: string): Promise<User | null> {
     return this.prismaService.users.findUnique({ where: { email } });
   }

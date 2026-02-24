@@ -76,6 +76,6 @@ export class UsersController {
     example: 'a1b2c3d4-e5f6-4789-abcd-ef1234567891',
   })
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+    return this.usersService.findOneWithSessions(id);
   }
 }

@@ -66,17 +66,20 @@ export class UsersService {
       );
     }
 
-    let password: string | undefined = user.password;
-
-    if (updateUserDto.password) {
-      password = await this.hashService.hashPassword(updateUserDto.password);
-    }
+    const hashedPassword = await this.hashService.hashPassword(
+      updateUserDto.password,
+    );
+    const userPassword =
+      updateUserDto.password === undefined ||
+      updateUserDto.password === user.password
+        ? updateUserDto.password
+        : hashedPassword;
 
     const data: Prisma.usersUpdateInput = {
       ...updateUserDto,
       first_name: updateUserDto.first_name,
       last_name: updateUserDto.last_name,
-      password,
+      password: userPassword,
       status: updateUserDto.status as UserStatus,
       //- Creation time cannot be updated but Last update time must always be updated.
       updated_at: new Date(),
@@ -135,6 +138,16 @@ export class UsersService {
 
   async findOne(id: string): Promise<User> {
     const user = await this.usersRepository.findById(id);
+
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
+    return user;
+  }
+
+  async findOneWithSessions(id: string): Promise<User> {
+    const user = await this.usersRepository.findByIdWithSessions(id);
 
     if (!user) {
       throw new NotFoundException('User not found.');
