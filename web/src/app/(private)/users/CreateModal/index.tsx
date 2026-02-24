@@ -127,6 +127,7 @@ const UserCreateModal: React.FC<UserCreateModalProps> = (props) => {
                       <button
                         type="submit"
                         form={idForm}
+                        aria-label="Create Save Button"
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm cursor-pointer"
                       >
                         <CircleStackIcon className="w-4 h-4" /> Save

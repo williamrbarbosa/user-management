@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -24,7 +23,7 @@ export class SessionsService {
 
     const session = await this.findActiveByUserId(user_id);
     if (session) {
-      throw new ConflictException('This user already has an active Session.');
+      return session;
     }
 
     const user = await this.usersRepository.findById(user_id);

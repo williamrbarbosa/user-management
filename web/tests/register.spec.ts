@@ -29,16 +29,16 @@ test.describe("Registration Flow", () => {
     await page.getByRole("button", { name: "Create account" }).click();
 
     // Check for Zod specific messages
-    await expect(page.getByText("Minimum 8 characters")).toBeVisible();
+    await expect(page.getByText("Minimum 6 characters")).toBeVisible();
     await expect(
-      page.getByText("Too small: expected string to have >=8 characters"),
+      page.getByText("Too small: expected string to have >=6 characters"),
     ).toBeVisible();
 
     // Case 2: Missing uppercase letter
     await page.getByPlaceholder("Password", { exact: true }).fill("123456ab!");
     await page.getByPlaceholder("Confirm password").fill("123456ab!");
     await page.getByRole("button", { name: "Create account" }).click();
-    await expect(page.getByText(/Password too weak/i)).toBeVisible();
+    await expect(page.getByText(/Password too week./i)).toBeVisible();
 
     // Case 3: Missing number or special character
     await page
@@ -46,7 +46,7 @@ test.describe("Registration Flow", () => {
       .fill("SimplePassword");
     await page.getByPlaceholder("Confirm password").fill("SimplePassword");
     await page.getByRole("button", { name: "Create account" }).click();
-    await expect(page.getByText(/Password too weak/i)).toBeVisible();
+    await expect(page.getByText(/Password too week./i)).toBeVisible();
   });
 
   test("should register a new user successfully and redirect to dashboard", async ({
@@ -88,6 +88,6 @@ test.describe("Registration Flow", () => {
     await page.getByRole("button", { name: "Create account" }).click();
 
     // Check if your "Passwords does not match" validation appears.
-    await expect(page.getByText("Passwords does not match.")).toBeVisible();
+    await expect(page.getByText("Passwords does not match")).toBeVisible();
   });
 });

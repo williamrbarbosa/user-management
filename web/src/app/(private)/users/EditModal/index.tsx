@@ -129,21 +129,20 @@ const UserEditModal: React.FC<UserEditModalProps> = (props) => {
 
                 <div className="p-2 space-y-2">
                   <div className="w-full h-full">
-                    {userData && (
-                      <FormUser
-                        idForm={idForm}
-                        handleSubmit={handleSubmit}
-                        onSubmit={onSubmit}
-                        register={register}
-                        setValue={setValue}
-                        errors={errors}
-                      />
-                    )}
+                    <FormUser
+                      idForm={idForm}
+                      handleSubmit={handleSubmit}
+                      onSubmit={onSubmit}
+                      register={register}
+                      setValue={setValue}
+                      errors={errors}
+                    />
 
                     <div className="h-auto justify-end items-end flex flex-row gap-2 p-4 border-y border-gray-300">
                       <button
                         type="submit"
                         form={idForm}
+                        aria-label="Edit Save Button"
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm cursor-pointer"
                       >
                         <CircleStackIcon className="w-4 h-4" /> Save

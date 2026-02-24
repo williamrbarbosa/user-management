@@ -113,33 +113,6 @@ describe('SessionsService', () => {
     expect(jest.spyOn(repository, 'create')).not.toHaveBeenCalled();
   });
 
-  it('should throw if user already has active session', async () => {
-    const userId = randomUUID();
-    const sessionId = randomUUID();
-
-    jest.spyOn(usersRepository, 'findById').mockResolvedValue({
-      id: userId,
-      status: UserStatus.ACTIVE,
-    } as User);
-
-    jest.spyOn(repository, 'findActiveByUserId').mockResolvedValue({
-      id: sessionId,
-      user_id: userId,
-      created_at: new Date(),
-      terminated_at: null,
-    } as Session);
-
-    await expect(service.createInternal({ user_id: userId })).rejects.toThrow(
-      ConflictException,
-    );
-
-    expect(jest.spyOn(repository, 'findActiveByUserId')).toHaveBeenCalledWith(
-      userId,
-    );
-    expect(jest.spyOn(usersRepository, 'findById')).not.toHaveBeenCalled();
-    expect(jest.spyOn(repository, 'create')).not.toHaveBeenCalled();
-  });
-
   it('should terminate active session', async () => {
     const userId = randomUUID();
     const sessionId = randomUUID();

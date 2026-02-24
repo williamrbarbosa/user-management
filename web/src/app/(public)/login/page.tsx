@@ -11,7 +11,7 @@ import { useState } from "react";
 import { LoginPayload } from "@/modules/auth/auth.service";
 
 const schema = z.object({
-  email: z.string().email("Inválid email"),
+  email: z.string().email("Invalid email"),
   password: z.string(),
   rememberme: z.boolean().optional(),
 });
@@ -107,6 +107,7 @@ export default function LoginPage() {
 
         <button
           disabled={loading}
+          aria-label="Sign Button"
           className="w-full bg-blue-600 hover:bg-blue-700 transition p-3 rounded text-white font-semibold cursor-pointer"
         >
           {loading ? "Signing in..." : "Sign-in"}
@@ -116,6 +117,7 @@ export default function LoginPage() {
           {"Don't have an account? "}
           <a
             href="/register"
+            aria-label="Register URL"
             className="text-blue-500 hover:text-blue-400 transition"
           >
             Sign up here

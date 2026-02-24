@@ -38,7 +38,7 @@ export default function PrivateLayout({
                 </span>
               </Link>
 
-              <div className="hidden md:flex items-center gap-6">
+              <div className="flex items-center gap-6">
                 <Link
                   href="/home"
                   className="text-sm font-medium text-gray-500 dark:text-gray-200 hover:text-blue-600 transition-colors"
@@ -60,20 +60,22 @@ export default function PrivateLayout({
               </div>
 
               <div className="flex items-center gap-3 pr-6 border-r border-gray-100">
-                <div className="text-right hidden sm:block">
-                  <p
-                    className="text-sm font-medium text-gray-900 dark:text-gray-100 leading-none"
-                    aria-label="user name"
-                  >
-                    {user?.last_name}, {user?.first_name}
-                  </p>
-                  <p
-                    className="text-xs text-gray-500 dark:text-gray-200 mt-1"
-                    aria-label="user email"
-                  >
-                    {user?.email}
-                  </p>
-                </div>
+                {user && (
+                  <div className="text-right">
+                    <p
+                      className="text-sm font-medium text-gray-900 dark:text-gray-100 leading-none"
+                      aria-label="user name"
+                    >
+                      {user.last_name}, {user.first_name}
+                    </p>
+                    <p
+                      className="text-xs text-gray-500 dark:text-gray-200 mt-1"
+                      aria-label="user email"
+                    >
+                      {user.email}
+                    </p>
+                  </div>
+                )}
 
                 {/* User's Avatar */}
                 <div className="px-2 min-w-10 h-8 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-md flex items-center justify-center text-white font-medium shadow-inner">

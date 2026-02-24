@@ -51,6 +51,15 @@ async function main() {
         status: UserStatus.ACTIVE,
       },
     }),
+    prisma.users.create({
+      data: {
+        first_name: 'Susan',
+        last_name: 'Doe',
+        email: 'susan.doe@gmail.com',
+        password: hashedPassword,
+        status: UserStatus.INACTIVE,
+      },
+    }),
   ]);
 
   console.log('✅ Users created:', users.length);

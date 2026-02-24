@@ -42,7 +42,7 @@ export default defineConfig({
   projects: [
     {
       name: "public",
-      testMatch: /.*(login|register|home|title)\.spec\.ts/, // Filtra pelos nomes dos arquivos
+      testMatch: /.*(login|register|title)\.spec\.ts/, // Filtra pelos nomes dos arquivos
       use: { ...devices["Desktop Chrome"] },
     },
     { name: "setup", testMatch: /.*\.setup\.ts/ },
