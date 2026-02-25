@@ -2,7 +2,7 @@ import React from "react";
 import { FieldErrors, UseFormRegisterReturn } from "react-hook-form";
 
 import { getErrorMessage } from "@/helpers/forms";
-import Label from "@/components/Label";
+import Label from "@/components/ui/Label";
 
 interface Options {
   name: string;

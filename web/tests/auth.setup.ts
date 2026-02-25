@@ -42,9 +42,7 @@ setup("authenticate", async ({ page }) => {
 
   await expect(page.getByLabel("user name")).toBeVisible({ timeout: 15000 });
 
-  const sessionStorage = await page.evaluate(() =>
-    JSON.stringify(sessionStorage),
-  );
+  await page.evaluate(() => JSON.stringify(sessionStorage));
 
   // Saves the state for reuse in other tests.
   await page.context().storageState({ path: authFile });

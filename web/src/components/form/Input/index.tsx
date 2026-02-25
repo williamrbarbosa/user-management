@@ -3,8 +3,7 @@ import { FieldErrors, UseFormRegisterReturn } from "react-hook-form";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 import { getErrorMessage } from "@/helpers/forms";
-
-import Label from "../../Label";
+import Label from "@/components/ui/Label";
 
 interface InputProps extends React.HTMLAttributes<HTMLElement> {
   register?: UseFormRegisterReturn;
