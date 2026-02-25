@@ -70,7 +70,7 @@ docker compose up --build
 | -------- | --------------------- |
 | Web      | http://localhost:3000 |
 | API      | http://localhost:3001 |
-| Postgres | localhost:5433        |
+| Postgres | localhost:5432        |
 | Redis    | localhost:6379        |
 
 ### 4. Seed the database
@@ -83,11 +83,12 @@ docker exec -it user-management-api npx prisma db seed
 
 Default credentials after seeding:
 
-| Name         | Email              | Password  |
-| ------------ | ------------------ | --------- |
-| System Admin | admin@company.com  | Admin@123 |
-| John Doe     | john.doe@gmail.com | Admin@123 |
-| Jane Doe     | jane.doe@gmail.com | Admin@123 |
+| Name         | Email               | Password  |
+| ------------ | ------------------- | --------- |
+| System Admin | admin@company.com   | Admin@123 |
+| John Doe     | john.doe@gmail.com  | Admin@123 |
+| Jane Doe     | jane.doe@gmail.com  | Admin@123 |
+| Susan Doe    | susan.doe@gmail.com | Admin@123 |
 
 ---
 

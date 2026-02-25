@@ -100,12 +100,12 @@ Swagger running at: **http://localhost:3001/docs**
 
 After running the seed, the following users are available:
 
-| Name         | Email              | Password  | Status   |
-| ------------ | ------------------ | --------- | -------- |
-| System Admin | admin@company.com  | Admin@123 | Active   |
-| John Doe     | john.doe@gmail.com | Admin@123 | Active   |
-| Jane Doe     | jane.doe@gmail.com | Admin@123 | Active   |
-| Susa Doe     | susa.doe@gmail.com | Admin@123 | Inactive |
+| Name         | Email               | Password  | Status   |
+| ------------ | ------------------- | --------- | -------- |
+| System Admin | admin@company.com   | Admin@123 | Active   |
+| John Doe     | john.doe@gmail.com  | Admin@123 | Active   |
+| Jane Doe     | jane.doe@gmail.com  | Admin@123 | Active   |
+| Susan Doe    | susan.doe@gmail.com | Admin@123 | Inactive |
 
 ---
 
