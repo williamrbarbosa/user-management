@@ -3,16 +3,13 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class HashService {
-  private readonly saltRounds = 10; // Define o número de rounds para hashing
+  private readonly saltRounds = 10;
 
   async hashPassword(password: string): Promise<string> {
-    return await bcrypt.hash(password, this.saltRounds);
+    return bcrypt.hash(password, this.saltRounds);
   }
 
-  async comparePassword(
-    password: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
-    return await bcrypt.compare(password, hashedPassword);
+  async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
+    return bcrypt.compare(password, hashedPassword);
   }
 }

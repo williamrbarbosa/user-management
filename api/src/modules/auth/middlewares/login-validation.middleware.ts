@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 import {
   BadRequestException,
   Injectable,
@@ -9,28 +6,19 @@ import {
 import { NextFunction, Request, Response } from 'express';
 import { LoginRequestBody } from '../models/LoginRequestBody';
 import { validate } from 'class-validator';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class LoginValidationMiddleware implements NestMiddleware {
-  async use(req: Request, res: Response, next: NextFunction) {
-    const body: Partial<LoginRequestBody> = req.body;
-
-    const loginRequestBody = new LoginRequestBody();
-    loginRequestBody.email = body.email;
-    loginRequestBody.password = body.password;
-    loginRequestBody.rememberme = body?.rememberme;
-
+  async use(req: Request, _res: Response, next: NextFunction): Promise<void> {
+    const loginRequestBody = plainToInstance(LoginRequestBody, req.body as object);
     const validations = await validate(loginRequestBody);
 
     if (validations.length) {
-      throw new BadRequestException(
-        validations.reduce((acc, curr) => {
-          return [
-            ...acc,
-            ...(curr.constraints ? Object.values(curr.constraints) : []),
-          ];
-        }, []),
+      const messages = validations.flatMap((v) =>
+        v.constraints ? Object.values(v.constraints) : [],
       );
+      throw new BadRequestException(messages);
     }
 
     next();

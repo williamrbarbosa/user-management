@@ -1,17 +1,16 @@
 import {
   IsEmail,
-  IsString,
-  MinLength,
-  MaxLength,
-  Matches,
-  IsOptional,
   IsEnum,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
-import { User } from '../entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserStatus } from '@prisma/client';
 
-export class CreateUserDto extends User {
+export class CreateUserDto {
   @IsString()
   @MinLength(3)
   @MaxLength(40)
@@ -33,13 +32,13 @@ export class CreateUserDto extends User {
   @MinLength(6)
   @MaxLength(60)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'Password too week.',
+    message: 'Password too weak.',
   })
-  @ApiProperty({ example: '1234@ChangeIt' })
+  @ApiProperty({ example: '1234@ChangeIt', required: false })
   password?: string;
 
-  @IsString()
   @IsEnum(UserStatus)
-  @ApiProperty({ example: UserStatus.ACTIVE, enum: UserStatus })
-  status: string;
+  @IsOptional()
+  @ApiProperty({ example: UserStatus.ACTIVE, enum: UserStatus, required: false })
+  status?: UserStatus;
 }

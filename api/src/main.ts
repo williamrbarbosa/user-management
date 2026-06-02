@@ -1,14 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { urlencoded, json } from 'express';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { LoggingInterceptor } from './interceptors/logging.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const logger = new Logger('Bootstrap');
 
-  // Pipes
+  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalInterceptors(new LoggingInterceptor());
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -18,40 +23,28 @@ async function bootstrap() {
     }),
   );
 
-  app.use(json({ limit: '50mb' }));
-  app.use(urlencoded({ extended: true, limit: '50mb' }));
+  app.use(json({ limit: '10mb' }));
+  app.use(urlencoded({ extended: true, limit: '10mb' }));
 
   app.enableShutdownHooks();
 
-  const allowedOrigins = ['http://localhost:3000'];
+  const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? 'http://localhost:3000').split(',');
 
   app.enableCors({
     origin: (origin, callback) => {
-      // Allow calls without an orgigin (e.g: cURL ou Postman)
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
-      } else {
-        return callback(
-          new Error(`Origin ${origin} not allowed by CORS`),
-          false,
-        );
       }
+
+      return callback(new Error(`Origin ${origin} not allowed by CORS`), false);
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'X-Requested-With',
-      'SessionId',
-      'process-data',
-      'preflight',
-    ],
-    credentials: true, // to send cookies
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   });
 
-  // Swagger Settings
   const config = new DocumentBuilder()
     .setTitle('Users Management System API')
     .setDescription('Documentation for Users Management System API')
@@ -60,8 +53,11 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document); // access by /docs
+  SwaggerModule.setup('docs', app, document);
 
-  await app.listen(process.env.PORT ?? 3001);
+  const port = process.env.PORT ?? 3001;
+  await app.listen(port);
+  logger.log(`Application running on port ${port}`);
 }
+
 bootstrap();

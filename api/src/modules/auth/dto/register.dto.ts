@@ -28,7 +28,7 @@ export class RegisterDto {
   @MinLength(6)
   @MaxLength(60)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'Password too week.',
+    message: 'Password too weak.',
   })
   @ApiProperty({ example: '123@Mudar' })
   user_password: string;

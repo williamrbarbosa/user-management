@@ -27,14 +27,8 @@ describe('UsersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
-        {
-          provide: UsersRepository,
-          useValue: usersRepositoryMock,
-        },
-        {
-          provide: HashService,
-          useValue: hashServiceMock,
-        },
+        { provide: UsersRepository, useValue: usersRepositoryMock },
+        { provide: HashService, useValue: hashServiceMock },
       ],
     }).compile();
 
@@ -53,7 +47,7 @@ describe('UsersService', () => {
     usersRepositoryMock.findByEmail.mockResolvedValue(null);
     hashServiceMock.hashPassword.mockResolvedValue('hashed-password');
     usersRepositoryMock.create.mockResolvedValue({
-      id: 'uuid',
+      id: randomUUID(),
       email: 'test@test.com',
       first_name: 'Test',
       last_name: 'User',
@@ -61,12 +55,10 @@ describe('UsersService', () => {
     });
 
     const result = await service.create({
-      id: randomUUID(),
       first_name: 'Test',
       last_name: 'User',
       email: 'test@test.com',
       password: '123456',
-      status: UserStatus.ACTIVE,
     });
 
     expect(result).toBeDefined();
@@ -76,16 +68,14 @@ describe('UsersService', () => {
   });
 
   it('should throw conflict if email already exists', async () => {
-    usersRepositoryMock.findByEmail.mockResolvedValue({ id: '1' });
+    usersRepositoryMock.findByEmail.mockResolvedValue({ id: randomUUID() });
 
     await expect(
       service.create({
-        id: randomUUID(),
         first_name: 'Test',
         last_name: 'User',
         email: 'test@test.com',
         password: '123456',
-        status: UserStatus.ACTIVE,
       }),
     ).rejects.toThrow(ConflictException);
 
@@ -103,11 +93,8 @@ describe('UsersService', () => {
 
     await expect(
       service.update(userId, {
-        id: userId,
         first_name: 'Jane',
         last_name: 'Smith',
-        email: 'jane.smith@test.com',
-        status: UserStatus.INACTIVE,
       }),
     ).rejects.toThrow(BadRequestException);
   });
@@ -120,22 +107,49 @@ describe('UsersService', () => {
       last_name: 'Doe',
       status: UserStatus.INACTIVE,
     });
-
     usersRepositoryMock.update.mockResolvedValue({ id: userId });
 
     const result = await service.update(userId, {
-      id: userId,
-      first_name: 'John',
-      last_name: 'Doe',
       email: 'new@email.com',
-      status: UserStatus.INACTIVE,
+      status: UserStatus.ACTIVE,
     });
 
     expect(result).toBeDefined();
     expect(usersRepositoryMock.update).toHaveBeenCalled();
   });
 
-  it('should delete user if not logged user', async () => {
+  it('should not hash password if not provided in update', async () => {
+    const userId = randomUUID();
+    usersRepositoryMock.findById.mockResolvedValue({
+      id: userId,
+      first_name: 'John',
+      last_name: 'Doe',
+      status: UserStatus.ACTIVE,
+    });
+    usersRepositoryMock.update.mockResolvedValue({ id: userId });
+
+    await service.update(userId, { email: 'new@email.com' });
+
+    expect(hashServiceMock.hashPassword).not.toHaveBeenCalled();
+  });
+
+  it('should hash password if provided in update', async () => {
+    const userId = randomUUID();
+    usersRepositoryMock.findById.mockResolvedValue({
+      id: userId,
+      first_name: 'John',
+      last_name: 'Doe',
+      status: UserStatus.ACTIVE,
+    });
+    hashServiceMock.hashPassword.mockResolvedValue('new-hashed-password');
+    usersRepositoryMock.update.mockResolvedValue({ id: userId });
+
+    await service.update(userId, { password: 'NewPass@123' });
+
+    expect(hashServiceMock.hashPassword).toHaveBeenCalledWith('NewPass@123');
+  });
+
+  it('should delete user if not the logged-in user', async () => {
     const userId = randomUUID();
     const loggedUserId = randomUUID();
 
@@ -148,7 +162,7 @@ describe('UsersService', () => {
     expect(usersRepositoryMock.delete).toHaveBeenCalledWith(userId);
   });
 
-  it('should throw error if deleting non-existing user', async () => {
+  it('should throw not found when deleting a non-existing user', async () => {
     const userId = randomUUID();
     const loggedUserId = randomUUID();
 
@@ -159,9 +173,8 @@ describe('UsersService', () => {
 
   it('should not allow deleting own user account', async () => {
     const userId = randomUUID();
-    const loggedUserId = userId;
 
-    await expect(service.remove(userId, loggedUserId)).rejects.toThrow(
+    await expect(service.remove(userId, userId)).rejects.toThrow(
       'Unable to delete your own user account!',
     );
   });

@@ -1,21 +1,22 @@
 import {
   IsBoolean,
+  IsEmail,
   IsOptional,
   IsString,
-  MaxLength,
-  MinLength,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginRequestBody {
-  @IsString()
-  @MinLength(10)
-  @MaxLength(60)
+  @IsEmail()
+  @ApiProperty({ example: 'john.doe@gmail.com' })
   email: string;
 
   @IsString()
+  @ApiProperty({ example: '123@Mudar' })
   password: string;
 
   @IsBoolean()
   @IsOptional()
+  @ApiProperty({ example: false, required: false })
   rememberme: boolean = false;
 }

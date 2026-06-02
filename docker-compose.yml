@@ -30,7 +30,8 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       - REDIS_URL=redis://redis:6379
       - NODE_ENV=production
-      - JWT_SECRET=HkG+0L60Hn1s1+NpYnbvawKnCvk2S6ziZNNwTdiFym8=
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000}
     depends_on:
       - postgres
       - redis
@@ -46,13 +47,8 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=http://localhost:3001
-      - WATCHPACK_POLLING=true
     depends_on:
       - api
-    volumes:
-      - ./web:/app
-      - /app/node_modules
-      - /app/.next
 
 volumes:
   pgdata:
