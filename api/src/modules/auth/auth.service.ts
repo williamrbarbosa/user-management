@@ -1,8 +1,6 @@
 import {
   BadRequestException,
   ConflictException,
-  HttpException,
-  HttpStatus,
   Injectable,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -11,9 +9,7 @@ import { UserPayload } from './models/UserPayload';
 import { UserResponseLogin } from './models/UserResponseLogin';
 import { UsersService } from 'src/modules/users/users.service';
 import { HashService } from 'src/modules/common/hash.service';
-import { AppError } from 'src/modules/common/models';
 import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
-import { randomUUID } from 'crypto';
 import { RegisterDto } from './dto/register.dto';
 import { User } from '../users/entities/user.entity';
 import { UserStatus } from '@prisma/client';
@@ -37,8 +33,8 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto): Promise<RegisterResponse> {
-    const user = await this.usersService.findByEmail(registerDto.email);
-    if (user) {
+    const existing = await this.usersService.findByEmail(registerDto.email);
+    if (existing) {
       throw new ConflictException('A user with this email already exists.');
     }
 
@@ -46,36 +42,22 @@ export class AuthService {
       throw new BadRequestException('Password confirmation does not match.');
     }
 
-    try {
-      const createUserDto: CreateUserDto = {
-        id: randomUUID(),
-        first_name: registerDto.first_name,
-        last_name: registerDto.last_name,
-        email: registerDto.email,
-        password: registerDto.user_password,
-        status: UserStatus.ACTIVE,
-        login_count: 0,
-        created_at: new Date(),
-        updated_at: new Date(),
-      };
+    const createUserDto: CreateUserDto = {
+      first_name: registerDto.first_name,
+      last_name: registerDto.last_name,
+      email: registerDto.email,
+      password: registerDto.user_password,
+      status: UserStatus.ACTIVE,
+    };
 
-      const user = await this.usersService.create(createUserDto);
+    const user = await this.usersService.create(createUserDto);
+    const maskedEmail = user.email.replace(/(.{1}).+(.{1}@.+)/, '$1****$2');
 
-      const maskedEmail = user.email.replace(/(.{1}).+(.{1}@.+)/, '$1****$2');
-
-      return {
-        status: 200,
-        email: maskedEmail,
-        message: 'Your account was created successfully.',
-      };
-    } catch (err) {
-      const error = err as AppError;
-      throw new HttpException(
-        'Error trying to register. ' + error.message,
-        HttpStatus.BAD_REQUEST,
-        { cause: error, description: error.message },
-      );
-    }
+    return {
+      status: 201,
+      email: maskedEmail,
+      message: 'Your account was created successfully.',
+    };
   }
 
   async login(
@@ -95,34 +77,30 @@ export class AuthService {
       session_id: session.id,
     };
 
-    const jwtToken = this.jwtService.sign(payload);
+    const expiresIn = rememberme ? 86400 : 3600;
+    const accessToken = this.jwtService.sign(payload, { expiresIn });
 
     return {
       tokenType: 'Bearer',
-      expiresIn: rememberme ? 86400 : 3600,
-      accessToken: jwtToken,
+      expiresIn,
+      accessToken,
       sessionId: session.id,
-      user: user,
+      user,
     };
   }
 
   async logout(user: User): Promise<Session> {
-    const session = await this.sessionsService.terminate(user.id);
-
-    return session;
+    return this.sessionsService.terminate(user.id);
   }
 
   async validateUser(email: string, password: string): Promise<User> {
     const user = await this.usersService.findByEmail(email);
-
-    const standardLoginErrorMessage = `The email or password entered is incorrect.`;
+    const standardError = 'The email or password entered is incorrect.';
 
     if (!user) {
-      throw new UnauthorizedError(standardLoginErrorMessage);
+      throw new UnauthorizedError(standardError);
     }
 
-    //Validating:
-    //- Inactive users cannot create sessions.
     if (user.status === UserStatus.INACTIVE) {
       throw new UnauthorizedError(
         "Your user is inactive and can't sign in. Contact the support.",
@@ -135,12 +113,9 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedError(standardLoginErrorMessage);
+      throw new UnauthorizedError(standardError);
     }
 
-    return {
-      ...user,
-      password: '',
-    };
+    return { ...user, password: '' };
   }
 }

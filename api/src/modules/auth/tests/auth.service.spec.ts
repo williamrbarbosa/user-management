@@ -168,7 +168,7 @@ describe('AuthService', () => {
       user_confirm_password: '123',
     });
 
-    expect(result.status).toBe(200);
+    expect(result.status).toBe(201);
     expect(usersServiceMock.findByEmail).toHaveBeenCalledWith('a@a.com');
   });
 

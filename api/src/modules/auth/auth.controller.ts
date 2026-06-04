@@ -11,12 +11,20 @@ import {
 import { AuthService } from './auth.service';
 import { AuthRequest } from './models/AuthRequest';
 import { IsPublic } from './decorators/is-public.decorator';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UserFromJwt } from './models/UserFromJwt';
 import { User } from '../common/decorators/user.decorator';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LoginRequestBody } from './models/LoginRequestBody';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -25,26 +33,34 @@ export class AuthController {
 
   @Post('register')
   @IsPublic()
-  @ApiOperation({ summary: 'Register a new User' })
-  async register(@Body() registerDto: RegisterDto) {
-    return await this.authService.register(registerDto);
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @ApiOperation({ summary: 'Register a new user' })
+  @ApiResponse({ status: 201, description: 'User registered successfully' })
+  @ApiResponse({ status: 409, description: 'Email already in use' })
+  async register(@Body() registerDto: RegisterDto): Promise<unknown> {
+    return this.authService.register(registerDto);
   }
 
   @Post('login')
   @IsPublic()
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'User login' })
-  login(@Request() req: AuthRequest) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-    return this.authService.login(req.users, req.body?.rememberme);
+  @ApiBody({ type: LoginRequestBody })
+  @ApiResponse({ status: 200, description: 'Login successful' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  login(@Request() req: AuthRequest): Promise<unknown> {
+    const rememberme = Boolean(req.body?.rememberme);
+    return this.authService.login(req.users, rememberme);
   }
 
   @Patch('logout')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'User logout' })
-  async logout(@User() user: UserFromJwt) {
-    return await this.authService.logout(user);
+  @ApiResponse({ status: 200, description: 'Logged out successfully' })
+  async logout(@User() user: UserFromJwt): Promise<unknown> {
+    return this.authService.logout(user);
   }
 }

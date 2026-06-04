@@ -1,11 +1,10 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { Request } from 'express';
 import { UserFromJwt } from 'src/modules/auth/models/UserFromJwt';
 
 export const User = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext): UserFromJwt => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const request = ctx.switchToHttp().getRequest();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+  (_data: unknown, ctx: ExecutionContext): UserFromJwt => {
+    const request = ctx.switchToHttp().getRequest<Request & { user: UserFromJwt }>();
     return request.user;
   },
 );

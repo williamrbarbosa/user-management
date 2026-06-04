@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -10,19 +11,20 @@ import { User } from './entities/user.entity';
 import { Prisma, UserStatus } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { HashService } from '../common/hash.service';
-import { AppError } from '../common/models';
 import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly hashService: HashService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = await this.findByEmail(createUserDto.email);
-    if (user) {
+    const existing = await this.findByEmail(createUserDto.email);
+    if (existing) {
       throw new ConflictException('A user with this email already exists.');
     }
 
@@ -31,11 +33,12 @@ export class UsersService {
     );
 
     const data: Prisma.usersCreateInput = {
-      ...createUserDto,
       id: randomUUID(),
-      status: UserStatus.ACTIVE,
+      first_name: createUserDto.first_name,
+      last_name: createUserDto.last_name,
+      email: createUserDto.email,
       password: hashedPassword,
-      //- Creation time cannot be updated but Last update time must always be updated.
+      status: createUserDto.status ?? UserStatus.ACTIVE,
       created_at: new Date(),
       updated_at: new Date(),
     };
@@ -43,56 +46,45 @@ export class UsersService {
     try {
       return this.usersRepository.create(data);
     } catch (err) {
-      const error = err as AppError;
-      throw new BadRequestException(
-        'Error trying to create user. ' + error.message,
-        { cause: error, description: error.message },
-      );
+      this.logger.error('Error creating user', err);
+      throw new BadRequestException('Error trying to create user.');
     }
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
 
-    //Validating:
-    //- First and Last Name properties cannot be updated if the user is inactive.
     const isNameChangeBlocked =
       user.status === UserStatus.INACTIVE &&
-      (updateUserDto.first_name !== user.first_name ||
-        updateUserDto.last_name !== user.last_name);
+      (
+        (updateUserDto.first_name !== undefined && updateUserDto.first_name !== user.first_name) ||
+        (updateUserDto.last_name !== undefined && updateUserDto.last_name !== user.last_name)
+      );
+
     if (isNameChangeBlocked) {
       throw new BadRequestException(
-        'Inactive users cannot update first or last name',
+        'Inactive users cannot update first or last name.',
       );
     }
 
-    const hashedPassword = await this.hashService.hashPassword(
-      updateUserDto.password,
-    );
-    const userPassword =
-      updateUserDto.password === undefined ||
-      updateUserDto.password === user.password
-        ? updateUserDto.password
-        : hashedPassword;
+    const hashedPassword = updateUserDto.password
+      ? await this.hashService.hashPassword(updateUserDto.password)
+      : undefined;
 
     const data: Prisma.usersUpdateInput = {
-      ...updateUserDto,
       first_name: updateUserDto.first_name,
       last_name: updateUserDto.last_name,
-      password: userPassword,
-      status: updateUserDto.status as UserStatus,
-      //- Creation time cannot be updated but Last update time must always be updated.
+      email: updateUserDto.email,
+      password: hashedPassword,
+      status: updateUserDto.status,
       updated_at: new Date(),
     };
 
     try {
       return this.usersRepository.update(id, data);
     } catch (err) {
-      const error = err as AppError;
-      throw new BadRequestException(
-        'Error trying to update user. ' + error.message,
-        { cause: error, description: error.message },
-      );
+      this.logger.error('Error updating user', err);
+      throw new BadRequestException('Error trying to update user.');
     }
   }
 
@@ -106,11 +98,8 @@ export class UsersService {
     try {
       return this.usersRepository.delete(user.id);
     } catch (err) {
-      const error = err as AppError;
-      throw new BadRequestException(
-        'Error trying to delete user. ' + error.message,
-        { cause: error, description: error.message },
-      );
+      this.logger.error('Error deleting user', err);
+      throw new BadRequestException('Error trying to delete user.');
     }
   }
 
@@ -118,7 +107,7 @@ export class UsersService {
     data: User[];
     meta: { total: number; page: number; lastPage: number };
   }> {
-    const limit: number = 6;
+    const limit = 6;
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
@@ -156,7 +145,7 @@ export class UsersService {
     return user;
   }
 
-  findByEmail(email: string): Promise<User> {
+  findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findByEmail(email);
   }
 }

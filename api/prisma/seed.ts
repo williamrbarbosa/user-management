@@ -67,7 +67,7 @@ async function main() {
   console.log('\n🎉 Seed completed successfully!');
   console.log(`\n📊 Overview:`);
   console.log(`   - ${users.length} users`);
-  console.log(`\n🔑 Standard Passwod: ${standardPassword}`);
+  console.log(`\n🔑 Standard Password: ${standardPassword}`);
 }
 
 main()
